@@ -1,0 +1,383 @@
+<?xml version='1.0' encoding='utf-8'?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <process id="sid-931F7364-7F12-4B42-8A43-528FFBCF8922" isClosed="false" isExecutable="false" processType="None">
+    <startEvent id="sid-BF79F939-0C9A-493E-A191-D5EE2A6A097A" name="" parallelMultiple="false" isInterrupting="true">
+      <outgoing>sid-FF9C860C-4A3A-478C-9FF9-69493B7EDA2F</outgoing>
+    </startEvent>
+  <task id="sid-078314A2-6A2C-4359-B5D8-734E38F1974C" name="Task 1 inside">
+      <incoming>sid-FF9C860C-4A3A-478C-9FF9-69493B7EDA2F</incoming>
+    <incoming>sid-004CA4F6-8C0A-4919-B930-2A1B67DD5DD1</incoming>
+    <outgoing>sid-7B47A6F7-8DD3-49E2-BB36-1285793C5DC3</outgoing>
+    </task>
+  <task id="sid-5920B6C5-2430-439C-98B8-C84BA016A3DB" name="Task 2 inside">
+      <incoming>sid-7B47A6F7-8DD3-49E2-BB36-1285793C5DC3</incoming>
+    <outgoing>sid-41844D5C-9EFB-4AA7-9B76-2918039F3251</outgoing>
+    <outgoing>sid-76F8128F-6FFD-4984-A798-1108D2C8C159</outgoing>
+    </task>
+  <endEvent id="sid-99241320-57A2-491A-832C-1C2DC05EBBBC" name="">
+      <incoming>sid-41844D5C-9EFB-4AA7-9B76-2918039F3251</incoming>
+    </endEvent>
+  <startEvent id="sid-BCEABD6B-306C-45E7-86FF-EF884208558D" name="" parallelMultiple="false" isInterrupting="true">
+      <outgoing>sid-20B65C75-8076-46D6-B6F5-4C2116DA021C</outgoing>
+    </startEvent>
+  <task id="sid-D919E95A-594C-42BB-8E62-A94F24B60DC4" name="Other Task 1 inside">
+      <incoming>sid-20B65C75-8076-46D6-B6F5-4C2116DA021C</incoming>
+    <outgoing>sid-AB6E07F5-4DA1-40E9-9247-2508A6236AF1</outgoing>
+    <outgoing>sid-004CA4F6-8C0A-4919-B930-2A1B67DD5DD1</outgoing>
+    </task>
+  <task id="sid-56091A6A-A06A-4ECA-9195-9F7270E7BA21" name="Other Task 2 inside">
+      <incoming>sid-AB6E07F5-4DA1-40E9-9247-2508A6236AF1</incoming>
+    <incoming>sid-76F8128F-6FFD-4984-A798-1108D2C8C159</incoming>
+    <outgoing>sid-BE926818-C636-4066-A89A-570BC67F3785</outgoing>
+    </task>
+  <endEvent id="sid-2E6AD687-A8BA-4913-ADA2-313BDD5EAD5B" name="">
+      <incoming>sid-BE926818-C636-4066-A89A-570BC67F3785</incoming>
+    </endEvent>
+  <startEvent id="sid-5393FE63-B0CB-49CB-A04A-7A7549D7D25C" name="" parallelMultiple="false" isInterrupting="true">
+      <outgoing>sid-27A66B62-CF28-4140-B016-B72008BD4C6D</outgoing>
+    </startEvent>
+  <task id="sid-583098EE-1C80-4B1F-8330-78CCA34FD836" name="Task 1 separate">
+      <incoming>sid-27A66B62-CF28-4140-B016-B72008BD4C6D</incoming>
+    <outgoing>sid-BB60DE23-F556-4B34-AEF9-1DD19BC4409D</outgoing>
+    </task>
+  <task id="sid-47D57197-A9AA-4F4D-B730-F349BC768F14" name="Task 2 separate">
+      <incoming>sid-BB60DE23-F556-4B34-AEF9-1DD19BC4409D</incoming>
+    <outgoing>sid-3CDDEBF4-7C16-4B8D-B2F8-1E10ADF8C0FD</outgoing>
+    </task>
+  <endEvent id="sid-B72C7DBA-B7CD-4AC0-B40E-8FEAE3B7B341" name="">
+      <incoming>sid-3CDDEBF4-7C16-4B8D-B2F8-1E10ADF8C0FD</incoming>
+    </endEvent>
+  <startEvent id="sid-CE74BFED-432E-4F9B-AC62-C8F06DD50F5D" name="" parallelMultiple="false" isInterrupting="true">
+      <outgoing>sid-F1B76470-BF6B-409C-B94C-E3DCC3DECB21</outgoing>
+    </startEvent>
+  <task id="sid-097D3D5E-CC5A-4F6D-B393-B6CF003688CB" name="Task 1 outside">
+      <incoming>sid-F1B76470-BF6B-409C-B94C-E3DCC3DECB21</incoming>
+    <outgoing>sid-F028F83C-51F1-4A65-B627-0C0EE874B4FE</outgoing>
+    </task>
+  <task id="sid-988C4FC2-A6A8-4DDB-8B4B-27112B3EDE38" name="Task 2 outside">
+      <incoming>sid-F028F83C-51F1-4A65-B627-0C0EE874B4FE</incoming>
+    <outgoing>sid-FBFBEE23-C8EA-44FB-B726-11DCE39D03B3</outgoing>
+    </task>
+  <endEvent id="sid-FEC43870-6945-4A1B-A73E-615F4BA5331D" name="">
+      <incoming>sid-FBFBEE23-C8EA-44FB-B726-11DCE39D03B3</incoming>
+    </endEvent>
+  <sequenceFlow id="sid-FF9C860C-4A3A-478C-9FF9-69493B7EDA2F" name="" sourceRef="sid-BF79F939-0C9A-493E-A191-D5EE2A6A097A" targetRef="sid-078314A2-6A2C-4359-B5D8-734E38F1974C" />
+  <sequenceFlow id="sid-7B47A6F7-8DD3-49E2-BB36-1285793C5DC3" name="" sourceRef="sid-078314A2-6A2C-4359-B5D8-734E38F1974C" targetRef="sid-5920B6C5-2430-439C-98B8-C84BA016A3DB" />
+  <sequenceFlow id="sid-004CA4F6-8C0A-4919-B930-2A1B67DD5DD1" name="" sourceRef="sid-D919E95A-594C-42BB-8E62-A94F24B60DC4" targetRef="sid-078314A2-6A2C-4359-B5D8-734E38F1974C" />
+  <sequenceFlow id="sid-41844D5C-9EFB-4AA7-9B76-2918039F3251" name="" sourceRef="sid-5920B6C5-2430-439C-98B8-C84BA016A3DB" targetRef="sid-99241320-57A2-491A-832C-1C2DC05EBBBC" />
+  <sequenceFlow id="sid-76F8128F-6FFD-4984-A798-1108D2C8C159" name="" sourceRef="sid-5920B6C5-2430-439C-98B8-C84BA016A3DB" targetRef="sid-56091A6A-A06A-4ECA-9195-9F7270E7BA21" />
+  <sequenceFlow id="sid-20B65C75-8076-46D6-B6F5-4C2116DA021C" name="" sourceRef="sid-BCEABD6B-306C-45E7-86FF-EF884208558D" targetRef="sid-D919E95A-594C-42BB-8E62-A94F24B60DC4" />
+  <sequenceFlow id="sid-AB6E07F5-4DA1-40E9-9247-2508A6236AF1" name="" sourceRef="sid-D919E95A-594C-42BB-8E62-A94F24B60DC4" targetRef="sid-56091A6A-A06A-4ECA-9195-9F7270E7BA21" />
+  <sequenceFlow id="sid-BE926818-C636-4066-A89A-570BC67F3785" name="" sourceRef="sid-56091A6A-A06A-4ECA-9195-9F7270E7BA21" targetRef="sid-2E6AD687-A8BA-4913-ADA2-313BDD5EAD5B" />
+  <sequenceFlow id="sid-27A66B62-CF28-4140-B016-B72008BD4C6D" name="" sourceRef="sid-5393FE63-B0CB-49CB-A04A-7A7549D7D25C" targetRef="sid-583098EE-1C80-4B1F-8330-78CCA34FD836" />
+  <sequenceFlow id="sid-BB60DE23-F556-4B34-AEF9-1DD19BC4409D" name="" sourceRef="sid-583098EE-1C80-4B1F-8330-78CCA34FD836" targetRef="sid-47D57197-A9AA-4F4D-B730-F349BC768F14" />
+  <sequenceFlow id="sid-3CDDEBF4-7C16-4B8D-B2F8-1E10ADF8C0FD" name="" sourceRef="sid-47D57197-A9AA-4F4D-B730-F349BC768F14" targetRef="sid-B72C7DBA-B7CD-4AC0-B40E-8FEAE3B7B341" />
+  <sequenceFlow id="sid-F1B76470-BF6B-409C-B94C-E3DCC3DECB21" name="" sourceRef="sid-CE74BFED-432E-4F9B-AC62-C8F06DD50F5D" targetRef="sid-097D3D5E-CC5A-4F6D-B393-B6CF003688CB" />
+  <sequenceFlow id="sid-F028F83C-51F1-4A65-B627-0C0EE874B4FE" name="" sourceRef="sid-097D3D5E-CC5A-4F6D-B393-B6CF003688CB" targetRef="sid-988C4FC2-A6A8-4DDB-8B4B-27112B3EDE38" />
+  <sequenceFlow id="sid-FBFBEE23-C8EA-44FB-B726-11DCE39D03B3" name="" sourceRef="sid-988C4FC2-A6A8-4DDB-8B4B-27112B3EDE38" targetRef="sid-FEC43870-6945-4A1B-A73E-615F4BA5331D" />
+  </process>
+<process id="sid-592BC2EB-BF8E-46FD-87D5-F30178A8316E" isClosed="false" isExecutable="false" processType="None">
+    <startEvent id="sid-BF79F939-0C9A-493E-A191-D5EE2A6A097A" name="" parallelMultiple="false" isInterrupting="true">
+      <outgoing>sid-FF9C860C-4A3A-478C-9FF9-69493B7EDA2F</outgoing>
+    </startEvent>
+  <task id="sid-078314A2-6A2C-4359-B5D8-734E38F1974C" name="Task 1 inside">
+      <incoming>sid-FF9C860C-4A3A-478C-9FF9-69493B7EDA2F</incoming>
+    <incoming>sid-004CA4F6-8C0A-4919-B930-2A1B67DD5DD1</incoming>
+    <outgoing>sid-7B47A6F7-8DD3-49E2-BB36-1285793C5DC3</outgoing>
+    </task>
+  <task id="sid-5920B6C5-2430-439C-98B8-C84BA016A3DB" name="Task 2 inside">
+      <incoming>sid-7B47A6F7-8DD3-49E2-BB36-1285793C5DC3</incoming>
+    <outgoing>sid-41844D5C-9EFB-4AA7-9B76-2918039F3251</outgoing>
+    <outgoing>sid-76F8128F-6FFD-4984-A798-1108D2C8C159</outgoing>
+    </task>
+  <endEvent id="sid-99241320-57A2-491A-832C-1C2DC05EBBBC" name="">
+      <incoming>sid-41844D5C-9EFB-4AA7-9B76-2918039F3251</incoming>
+    </endEvent>
+  <startEvent id="sid-BCEABD6B-306C-45E7-86FF-EF884208558D" name="" parallelMultiple="false" isInterrupting="true">
+      <outgoing>sid-20B65C75-8076-46D6-B6F5-4C2116DA021C</outgoing>
+    </startEvent>
+  <task id="sid-D919E95A-594C-42BB-8E62-A94F24B60DC4" name="Other Task 1 inside">
+      <incoming>sid-20B65C75-8076-46D6-B6F5-4C2116DA021C</incoming>
+    <outgoing>sid-AB6E07F5-4DA1-40E9-9247-2508A6236AF1</outgoing>
+    <outgoing>sid-004CA4F6-8C0A-4919-B930-2A1B67DD5DD1</outgoing>
+    </task>
+  <task id="sid-56091A6A-A06A-4ECA-9195-9F7270E7BA21" name="Other Task 2 inside">
+      <incoming>sid-AB6E07F5-4DA1-40E9-9247-2508A6236AF1</incoming>
+    <incoming>sid-76F8128F-6FFD-4984-A798-1108D2C8C159</incoming>
+    <outgoing>sid-BE926818-C636-4066-A89A-570BC67F3785</outgoing>
+    </task>
+  <endEvent id="sid-2E6AD687-A8BA-4913-ADA2-313BDD5EAD5B" name="">
+      <incoming>sid-BE926818-C636-4066-A89A-570BC67F3785</incoming>
+    </endEvent>
+  <startEvent id="sid-5393FE63-B0CB-49CB-A04A-7A7549D7D25C" name="" parallelMultiple="false" isInterrupting="true">
+      <outgoing>sid-27A66B62-CF28-4140-B016-B72008BD4C6D</outgoing>
+    </startEvent>
+  <task id="sid-583098EE-1C80-4B1F-8330-78CCA34FD836" name="Task 1 separate">
+      <incoming>sid-27A66B62-CF28-4140-B016-B72008BD4C6D</incoming>
+    <outgoing>sid-BB60DE23-F556-4B34-AEF9-1DD19BC4409D</outgoing>
+    </task>
+  <task id="sid-47D57197-A9AA-4F4D-B730-F349BC768F14" name="Task 2 separate">
+      <incoming>sid-BB60DE23-F556-4B34-AEF9-1DD19BC4409D</incoming>
+    <outgoing>sid-3CDDEBF4-7C16-4B8D-B2F8-1E10ADF8C0FD</outgoing>
+    </task>
+  <endEvent id="sid-B72C7DBA-B7CD-4AC0-B40E-8FEAE3B7B341" name="">
+      <incoming>sid-3CDDEBF4-7C16-4B8D-B2F8-1E10ADF8C0FD</incoming>
+    </endEvent>
+  <startEvent id="sid-CE74BFED-432E-4F9B-AC62-C8F06DD50F5D" name="" parallelMultiple="false" isInterrupting="true">
+      <outgoing>sid-F1B76470-BF6B-409C-B94C-E3DCC3DECB21</outgoing>
+    </startEvent>
+  <task id="sid-097D3D5E-CC5A-4F6D-B393-B6CF003688CB" name="Task 1 outside">
+      <incoming>sid-F1B76470-BF6B-409C-B94C-E3DCC3DECB21</incoming>
+    <outgoing>sid-F028F83C-51F1-4A65-B627-0C0EE874B4FE</outgoing>
+    </task>
+  <task id="sid-988C4FC2-A6A8-4DDB-8B4B-27112B3EDE38" name="Task 2 outside">
+      <incoming>sid-F028F83C-51F1-4A65-B627-0C0EE874B4FE</incoming>
+    <outgoing>sid-FBFBEE23-C8EA-44FB-B726-11DCE39D03B3</outgoing>
+    </task>
+  <endEvent id="sid-FEC43870-6945-4A1B-A73E-615F4BA5331D" name="">
+      <incoming>sid-FBFBEE23-C8EA-44FB-B726-11DCE39D03B3</incoming>
+    </endEvent>
+  <sequenceFlow id="sid-FF9C860C-4A3A-478C-9FF9-69493B7EDA2F" name="" sourceRef="sid-BF79F939-0C9A-493E-A191-D5EE2A6A097A" targetRef="sid-078314A2-6A2C-4359-B5D8-734E38F1974C" />
+  <sequenceFlow id="sid-7B47A6F7-8DD3-49E2-BB36-1285793C5DC3" name="" sourceRef="sid-078314A2-6A2C-4359-B5D8-734E38F1974C" targetRef="sid-5920B6C5-2430-439C-98B8-C84BA016A3DB" />
+  <sequenceFlow id="sid-004CA4F6-8C0A-4919-B930-2A1B67DD5DD1" name="" sourceRef="sid-D919E95A-594C-42BB-8E62-A94F24B60DC4" targetRef="sid-078314A2-6A2C-4359-B5D8-734E38F1974C" />
+  <sequenceFlow id="sid-41844D5C-9EFB-4AA7-9B76-2918039F3251" name="" sourceRef="sid-5920B6C5-2430-439C-98B8-C84BA016A3DB" targetRef="sid-99241320-57A2-491A-832C-1C2DC05EBBBC" />
+  <sequenceFlow id="sid-76F8128F-6FFD-4984-A798-1108D2C8C159" name="" sourceRef="sid-5920B6C5-2430-439C-98B8-C84BA016A3DB" targetRef="sid-56091A6A-A06A-4ECA-9195-9F7270E7BA21" />
+  <sequenceFlow id="sid-20B65C75-8076-46D6-B6F5-4C2116DA021C" name="" sourceRef="sid-BCEABD6B-306C-45E7-86FF-EF884208558D" targetRef="sid-D919E95A-594C-42BB-8E62-A94F24B60DC4" />
+  <sequenceFlow id="sid-AB6E07F5-4DA1-40E9-9247-2508A6236AF1" name="" sourceRef="sid-D919E95A-594C-42BB-8E62-A94F24B60DC4" targetRef="sid-56091A6A-A06A-4ECA-9195-9F7270E7BA21" />
+  <sequenceFlow id="sid-BE926818-C636-4066-A89A-570BC67F3785" name="" sourceRef="sid-56091A6A-A06A-4ECA-9195-9F7270E7BA21" targetRef="sid-2E6AD687-A8BA-4913-ADA2-313BDD5EAD5B" />
+  <sequenceFlow id="sid-27A66B62-CF28-4140-B016-B72008BD4C6D" name="" sourceRef="sid-5393FE63-B0CB-49CB-A04A-7A7549D7D25C" targetRef="sid-583098EE-1C80-4B1F-8330-78CCA34FD836" />
+  <sequenceFlow id="sid-BB60DE23-F556-4B34-AEF9-1DD19BC4409D" name="" sourceRef="sid-583098EE-1C80-4B1F-8330-78CCA34FD836" targetRef="sid-47D57197-A9AA-4F4D-B730-F349BC768F14" />
+  <sequenceFlow id="sid-3CDDEBF4-7C16-4B8D-B2F8-1E10ADF8C0FD" name="" sourceRef="sid-47D57197-A9AA-4F4D-B730-F349BC768F14" targetRef="sid-B72C7DBA-B7CD-4AC0-B40E-8FEAE3B7B341" />
+  <sequenceFlow id="sid-F1B76470-BF6B-409C-B94C-E3DCC3DECB21" name="" sourceRef="sid-CE74BFED-432E-4F9B-AC62-C8F06DD50F5D" targetRef="sid-097D3D5E-CC5A-4F6D-B393-B6CF003688CB" />
+  <sequenceFlow id="sid-F028F83C-51F1-4A65-B627-0C0EE874B4FE" name="" sourceRef="sid-097D3D5E-CC5A-4F6D-B393-B6CF003688CB" targetRef="sid-988C4FC2-A6A8-4DDB-8B4B-27112B3EDE38" />
+  <sequenceFlow id="sid-FBFBEE23-C8EA-44FB-B726-11DCE39D03B3" name="" sourceRef="sid-988C4FC2-A6A8-4DDB-8B4B-27112B3EDE38" targetRef="sid-FEC43870-6945-4A1B-A73E-615F4BA5331D" />
+  </process>
+<process id="sid-69F047A8-2A62-4831-93CD-9B9C0146DDB0" isClosed="false" isExecutable="false" processType="None">
+    <startEvent id="sid-BF79F939-0C9A-493E-A191-D5EE2A6A097A" name="" parallelMultiple="false" isInterrupting="true">
+      <outgoing>sid-FF9C860C-4A3A-478C-9FF9-69493B7EDA2F</outgoing>
+    </startEvent>
+  <task id="sid-078314A2-6A2C-4359-B5D8-734E38F1974C" name="Task 1 inside">
+      <incoming>sid-FF9C860C-4A3A-478C-9FF9-69493B7EDA2F</incoming>
+    <incoming>sid-004CA4F6-8C0A-4919-B930-2A1B67DD5DD1</incoming>
+    <outgoing>sid-7B47A6F7-8DD3-49E2-BB36-1285793C5DC3</outgoing>
+    </task>
+  <task id="sid-5920B6C5-2430-439C-98B8-C84BA016A3DB" name="Task 2 inside">
+      <incoming>sid-7B47A6F7-8DD3-49E2-BB36-1285793C5DC3</incoming>
+    <outgoing>sid-41844D5C-9EFB-4AA7-9B76-2918039F3251</outgoing>
+    <outgoing>sid-76F8128F-6FFD-4984-A798-1108D2C8C159</outgoing>
+    </task>
+  <endEvent id="sid-99241320-57A2-491A-832C-1C2DC05EBBBC" name="">
+      <incoming>sid-41844D5C-9EFB-4AA7-9B76-2918039F3251</incoming>
+    </endEvent>
+  <startEvent id="sid-BCEABD6B-306C-45E7-86FF-EF884208558D" name="" parallelMultiple="false" isInterrupting="true">
+      <outgoing>sid-20B65C75-8076-46D6-B6F5-4C2116DA021C</outgoing>
+    </startEvent>
+  <task id="sid-D919E95A-594C-42BB-8E62-A94F24B60DC4" name="Other Task 1 inside">
+      <incoming>sid-20B65C75-8076-46D6-B6F5-4C2116DA021C</incoming>
+    <outgoing>sid-AB6E07F5-4DA1-40E9-9247-2508A6236AF1</outgoing>
+    <outgoing>sid-004CA4F6-8C0A-4919-B930-2A1B67DD5DD1</outgoing>
+    </task>
+  <task id="sid-56091A6A-A06A-4ECA-9195-9F7270E7BA21" name="Other Task 2 inside">
+      <incoming>sid-AB6E07F5-4DA1-40E9-9247-2508A6236AF1</incoming>
+    <incoming>sid-76F8128F-6FFD-4984-A798-1108D2C8C159</incoming>
+    <outgoing>sid-BE926818-C636-4066-A89A-570BC67F3785</outgoing>
+    </task>
+  <endEvent id="sid-2E6AD687-A8BA-4913-ADA2-313BDD5EAD5B" name="">
+      <incoming>sid-BE926818-C636-4066-A89A-570BC67F3785</incoming>
+    </endEvent>
+  <startEvent id="sid-5393FE63-B0CB-49CB-A04A-7A7549D7D25C" name="" parallelMultiple="false" isInterrupting="true">
+      <outgoing>sid-27A66B62-CF28-4140-B016-B72008BD4C6D</outgoing>
+    </startEvent>
+  <task id="sid-583098EE-1C80-4B1F-8330-78CCA34FD836" name="Task 1 separate">
+      <incoming>sid-27A66B62-CF28-4140-B016-B72008BD4C6D</incoming>
+    <outgoing>sid-BB60DE23-F556-4B34-AEF9-1DD19BC4409D</outgoing>
+    </task>
+  <task id="sid-47D57197-A9AA-4F4D-B730-F349BC768F14" name="Task 2 separate">
+      <incoming>sid-BB60DE23-F556-4B34-AEF9-1DD19BC4409D</incoming>
+    <outgoing>sid-3CDDEBF4-7C16-4B8D-B2F8-1E10ADF8C0FD</outgoing>
+    </task>
+  <endEvent id="sid-B72C7DBA-B7CD-4AC0-B40E-8FEAE3B7B341" name="">
+      <incoming>sid-3CDDEBF4-7C16-4B8D-B2F8-1E10ADF8C0FD</incoming>
+    </endEvent>
+  <startEvent id="sid-CE74BFED-432E-4F9B-AC62-C8F06DD50F5D" name="" parallelMultiple="false" isInterrupting="true">
+      <outgoing>sid-F1B76470-BF6B-409C-B94C-E3DCC3DECB21</outgoing>
+    </startEvent>
+  <task id="sid-097D3D5E-CC5A-4F6D-B393-B6CF003688CB" name="Task 1 outside">
+      <incoming>sid-F1B76470-BF6B-409C-B94C-E3DCC3DECB21</incoming>
+    <outgoing>sid-F028F83C-51F1-4A65-B627-0C0EE874B4FE</outgoing>
+    </task>
+  <task id="sid-988C4FC2-A6A8-4DDB-8B4B-27112B3EDE38" name="Task 2 outside">
+      <incoming>sid-F028F83C-51F1-4A65-B627-0C0EE874B4FE</incoming>
+    <outgoing>sid-FBFBEE23-C8EA-44FB-B726-11DCE39D03B3</outgoing>
+    </task>
+  <endEvent id="sid-FEC43870-6945-4A1B-A73E-615F4BA5331D" name="">
+      <incoming>sid-FBFBEE23-C8EA-44FB-B726-11DCE39D03B3</incoming>
+    </endEvent>
+  <sequenceFlow id="sid-FF9C860C-4A3A-478C-9FF9-69493B7EDA2F" name="" sourceRef="sid-BF79F939-0C9A-493E-A191-D5EE2A6A097A" targetRef="sid-078314A2-6A2C-4359-B5D8-734E38F1974C" />
+  <sequenceFlow id="sid-7B47A6F7-8DD3-49E2-BB36-1285793C5DC3" name="" sourceRef="sid-078314A2-6A2C-4359-B5D8-734E38F1974C" targetRef="sid-5920B6C5-2430-439C-98B8-C84BA016A3DB" />
+  <sequenceFlow id="sid-004CA4F6-8C0A-4919-B930-2A1B67DD5DD1" name="" sourceRef="sid-D919E95A-594C-42BB-8E62-A94F24B60DC4" targetRef="sid-078314A2-6A2C-4359-B5D8-734E38F1974C" />
+  <sequenceFlow id="sid-41844D5C-9EFB-4AA7-9B76-2918039F3251" name="" sourceRef="sid-5920B6C5-2430-439C-98B8-C84BA016A3DB" targetRef="sid-99241320-57A2-491A-832C-1C2DC05EBBBC" />
+  <sequenceFlow id="sid-76F8128F-6FFD-4984-A798-1108D2C8C159" name="" sourceRef="sid-5920B6C5-2430-439C-98B8-C84BA016A3DB" targetRef="sid-56091A6A-A06A-4ECA-9195-9F7270E7BA21" />
+  <sequenceFlow id="sid-20B65C75-8076-46D6-B6F5-4C2116DA021C" name="" sourceRef="sid-BCEABD6B-306C-45E7-86FF-EF884208558D" targetRef="sid-D919E95A-594C-42BB-8E62-A94F24B60DC4" />
+  <sequenceFlow id="sid-AB6E07F5-4DA1-40E9-9247-2508A6236AF1" name="" sourceRef="sid-D919E95A-594C-42BB-8E62-A94F24B60DC4" targetRef="sid-56091A6A-A06A-4ECA-9195-9F7270E7BA21" />
+  <sequenceFlow id="sid-BE926818-C636-4066-A89A-570BC67F3785" name="" sourceRef="sid-56091A6A-A06A-4ECA-9195-9F7270E7BA21" targetRef="sid-2E6AD687-A8BA-4913-ADA2-313BDD5EAD5B" />
+  <sequenceFlow id="sid-27A66B62-CF28-4140-B016-B72008BD4C6D" name="" sourceRef="sid-5393FE63-B0CB-49CB-A04A-7A7549D7D25C" targetRef="sid-583098EE-1C80-4B1F-8330-78CCA34FD836" />
+  <sequenceFlow id="sid-BB60DE23-F556-4B34-AEF9-1DD19BC4409D" name="" sourceRef="sid-583098EE-1C80-4B1F-8330-78CCA34FD836" targetRef="sid-47D57197-A9AA-4F4D-B730-F349BC768F14" />
+  <sequenceFlow id="sid-3CDDEBF4-7C16-4B8D-B2F8-1E10ADF8C0FD" name="" sourceRef="sid-47D57197-A9AA-4F4D-B730-F349BC768F14" targetRef="sid-B72C7DBA-B7CD-4AC0-B40E-8FEAE3B7B341" />
+  <sequenceFlow id="sid-F1B76470-BF6B-409C-B94C-E3DCC3DECB21" name="" sourceRef="sid-CE74BFED-432E-4F9B-AC62-C8F06DD50F5D" targetRef="sid-097D3D5E-CC5A-4F6D-B393-B6CF003688CB" />
+  <sequenceFlow id="sid-F028F83C-51F1-4A65-B627-0C0EE874B4FE" name="" sourceRef="sid-097D3D5E-CC5A-4F6D-B393-B6CF003688CB" targetRef="sid-988C4FC2-A6A8-4DDB-8B4B-27112B3EDE38" />
+  <sequenceFlow id="sid-FBFBEE23-C8EA-44FB-B726-11DCE39D03B3" name="" sourceRef="sid-988C4FC2-A6A8-4DDB-8B4B-27112B3EDE38" targetRef="sid-FEC43870-6945-4A1B-A73E-615F4BA5331D" />
+  </process>
+<process id="sid-52718A7E-D418-4F58-8429-373CBAABCA7E" isClosed="false" isExecutable="false" processType="None">
+    <startEvent id="sid-BF79F939-0C9A-493E-A191-D5EE2A6A097A" name="" parallelMultiple="false" isInterrupting="true">
+      <outgoing>sid-FF9C860C-4A3A-478C-9FF9-69493B7EDA2F</outgoing>
+    </startEvent>
+  <task id="sid-078314A2-6A2C-4359-B5D8-734E38F1974C" name="Task 1 inside">
+      <incoming>sid-FF9C860C-4A3A-478C-9FF9-69493B7EDA2F</incoming>
+    <incoming>sid-004CA4F6-8C0A-4919-B930-2A1B67DD5DD1</incoming>
+    <outgoing>sid-7B47A6F7-8DD3-49E2-BB36-1285793C5DC3</outgoing>
+    </task>
+  <task id="sid-5920B6C5-2430-439C-98B8-C84BA016A3DB" name="Task 2 inside">
+      <incoming>sid-7B47A6F7-8DD3-49E2-BB36-1285793C5DC3</incoming>
+    <outgoing>sid-41844D5C-9EFB-4AA7-9B76-2918039F3251</outgoing>
+    <outgoing>sid-76F8128F-6FFD-4984-A798-1108D2C8C159</outgoing>
+    </task>
+  <endEvent id="sid-99241320-57A2-491A-832C-1C2DC05EBBBC" name="">
+      <incoming>sid-41844D5C-9EFB-4AA7-9B76-2918039F3251</incoming>
+    </endEvent>
+  <startEvent id="sid-BCEABD6B-306C-45E7-86FF-EF884208558D" name="" parallelMultiple="false" isInterrupting="true">
+      <outgoing>sid-20B65C75-8076-46D6-B6F5-4C2116DA021C</outgoing>
+    </startEvent>
+  <task id="sid-D919E95A-594C-42BB-8E62-A94F24B60DC4" name="Other Task 1 inside">
+      <incoming>sid-20B65C75-8076-46D6-B6F5-4C2116DA021C</incoming>
+    <outgoing>sid-AB6E07F5-4DA1-40E9-9247-2508A6236AF1</outgoing>
+    <outgoing>sid-004CA4F6-8C0A-4919-B930-2A1B67DD5DD1</outgoing>
+    </task>
+  <task id="sid-56091A6A-A06A-4ECA-9195-9F7270E7BA21" name="Other Task 2 inside">
+      <incoming>sid-AB6E07F5-4DA1-40E9-9247-2508A6236AF1</incoming>
+    <incoming>sid-76F8128F-6FFD-4984-A798-1108D2C8C159</incoming>
+    <outgoing>sid-BE926818-C636-4066-A89A-570BC67F3785</outgoing>
+    </task>
+  <endEvent id="sid-2E6AD687-A8BA-4913-ADA2-313BDD5EAD5B" name="">
+      <incoming>sid-BE926818-C636-4066-A89A-570BC67F3785</incoming>
+    </endEvent>
+  <startEvent id="sid-5393FE63-B0CB-49CB-A04A-7A7549D7D25C" name="" parallelMultiple="false" isInterrupting="true">
+      <outgoing>sid-27A66B62-CF28-4140-B016-B72008BD4C6D</outgoing>
+    </startEvent>
+  <task id="sid-583098EE-1C80-4B1F-8330-78CCA34FD836" name="Task 1 separate">
+      <incoming>sid-27A66B62-CF28-4140-B016-B72008BD4C6D</incoming>
+    <outgoing>sid-BB60DE23-F556-4B34-AEF9-1DD19BC4409D</outgoing>
+    </task>
+  <task id="sid-47D57197-A9AA-4F4D-B730-F349BC768F14" name="Task 2 separate">
+      <incoming>sid-BB60DE23-F556-4B34-AEF9-1DD19BC4409D</incoming>
+    <outgoing>sid-3CDDEBF4-7C16-4B8D-B2F8-1E10ADF8C0FD</outgoing>
+    </task>
+  <endEvent id="sid-B72C7DBA-B7CD-4AC0-B40E-8FEAE3B7B341" name="">
+      <incoming>sid-3CDDEBF4-7C16-4B8D-B2F8-1E10ADF8C0FD</incoming>
+    </endEvent>
+  <startEvent id="sid-CE74BFED-432E-4F9B-AC62-C8F06DD50F5D" name="" parallelMultiple="false" isInterrupting="true">
+      <outgoing>sid-F1B76470-BF6B-409C-B94C-E3DCC3DECB21</outgoing>
+    </startEvent>
+  <task id="sid-097D3D5E-CC5A-4F6D-B393-B6CF003688CB" name="Task 1 outside">
+      <incoming>sid-F1B76470-BF6B-409C-B94C-E3DCC3DECB21</incoming>
+    <outgoing>sid-F028F83C-51F1-4A65-B627-0C0EE874B4FE</outgoing>
+    </task>
+  <task id="sid-988C4FC2-A6A8-4DDB-8B4B-27112B3EDE38" name="Task 2 outside">
+      <incoming>sid-F028F83C-51F1-4A65-B627-0C0EE874B4FE</incoming>
+    <outgoing>sid-FBFBEE23-C8EA-44FB-B726-11DCE39D03B3</outgoing>
+    </task>
+  <endEvent id="sid-FEC43870-6945-4A1B-A73E-615F4BA5331D" name="">
+      <incoming>sid-FBFBEE23-C8EA-44FB-B726-11DCE39D03B3</incoming>
+    </endEvent>
+  <sequenceFlow id="sid-FF9C860C-4A3A-478C-9FF9-69493B7EDA2F" name="" sourceRef="sid-BF79F939-0C9A-493E-A191-D5EE2A6A097A" targetRef="sid-078314A2-6A2C-4359-B5D8-734E38F1974C" />
+  <sequenceFlow id="sid-7B47A6F7-8DD3-49E2-BB36-1285793C5DC3" name="" sourceRef="sid-078314A2-6A2C-4359-B5D8-734E38F1974C" targetRef="sid-5920B6C5-2430-439C-98B8-C84BA016A3DB" />
+  <sequenceFlow id="sid-004CA4F6-8C0A-4919-B930-2A1B67DD5DD1" name="" sourceRef="sid-D919E95A-594C-42BB-8E62-A94F24B60DC4" targetRef="sid-078314A2-6A2C-4359-B5D8-734E38F1974C" />
+  <sequenceFlow id="sid-41844D5C-9EFB-4AA7-9B76-2918039F3251" name="" sourceRef="sid-5920B6C5-2430-439C-98B8-C84BA016A3DB" targetRef="sid-99241320-57A2-491A-832C-1C2DC05EBBBC" />
+  <sequenceFlow id="sid-76F8128F-6FFD-4984-A798-1108D2C8C159" name="" sourceRef="sid-5920B6C5-2430-439C-98B8-C84BA016A3DB" targetRef="sid-56091A6A-A06A-4ECA-9195-9F7270E7BA21" />
+  <sequenceFlow id="sid-20B65C75-8076-46D6-B6F5-4C2116DA021C" name="" sourceRef="sid-BCEABD6B-306C-45E7-86FF-EF884208558D" targetRef="sid-D919E95A-594C-42BB-8E62-A94F24B60DC4" />
+  <sequenceFlow id="sid-AB6E07F5-4DA1-40E9-9247-2508A6236AF1" name="" sourceRef="sid-D919E95A-594C-42BB-8E62-A94F24B60DC4" targetRef="sid-56091A6A-A06A-4ECA-9195-9F7270E7BA21" />
+  <sequenceFlow id="sid-BE926818-C636-4066-A89A-570BC67F3785" name="" sourceRef="sid-56091A6A-A06A-4ECA-9195-9F7270E7BA21" targetRef="sid-2E6AD687-A8BA-4913-ADA2-313BDD5EAD5B" />
+  <sequenceFlow id="sid-27A66B62-CF28-4140-B016-B72008BD4C6D" name="" sourceRef="sid-5393FE63-B0CB-49CB-A04A-7A7549D7D25C" targetRef="sid-583098EE-1C80-4B1F-8330-78CCA34FD836" />
+  <sequenceFlow id="sid-BB60DE23-F556-4B34-AEF9-1DD19BC4409D" name="" sourceRef="sid-583098EE-1C80-4B1F-8330-78CCA34FD836" targetRef="sid-47D57197-A9AA-4F4D-B730-F349BC768F14" />
+  <sequenceFlow id="sid-3CDDEBF4-7C16-4B8D-B2F8-1E10ADF8C0FD" name="" sourceRef="sid-47D57197-A9AA-4F4D-B730-F349BC768F14" targetRef="sid-B72C7DBA-B7CD-4AC0-B40E-8FEAE3B7B341" />
+  <sequenceFlow id="sid-F1B76470-BF6B-409C-B94C-E3DCC3DECB21" name="" sourceRef="sid-CE74BFED-432E-4F9B-AC62-C8F06DD50F5D" targetRef="sid-097D3D5E-CC5A-4F6D-B393-B6CF003688CB" />
+  <sequenceFlow id="sid-F028F83C-51F1-4A65-B627-0C0EE874B4FE" name="" sourceRef="sid-097D3D5E-CC5A-4F6D-B393-B6CF003688CB" targetRef="sid-988C4FC2-A6A8-4DDB-8B4B-27112B3EDE38" />
+  <sequenceFlow id="sid-FBFBEE23-C8EA-44FB-B726-11DCE39D03B3" name="" sourceRef="sid-988C4FC2-A6A8-4DDB-8B4B-27112B3EDE38" targetRef="sid-FEC43870-6945-4A1B-A73E-615F4BA5331D" />
+  </process>
+<process id="sid-5d6376ec-afe3-4730-a704-a71912f479cb" isClosed="false" isExecutable="false" processType="None">
+    <startEvent id="sid-BF79F939-0C9A-493E-A191-D5EE2A6A097A" name="" parallelMultiple="false" isInterrupting="true">
+      <outgoing>sid-FF9C860C-4A3A-478C-9FF9-69493B7EDA2F</outgoing>
+    </startEvent>
+  <task id="sid-078314A2-6A2C-4359-B5D8-734E38F1974C" name="Task 1 inside">
+      <incoming>sid-FF9C860C-4A3A-478C-9FF9-69493B7EDA2F</incoming>
+    <incoming>sid-004CA4F6-8C0A-4919-B930-2A1B67DD5DD1</incoming>
+    <outgoing>sid-7B47A6F7-8DD3-49E2-BB36-1285793C5DC3</outgoing>
+    </task>
+  <task id="sid-5920B6C5-2430-439C-98B8-C84BA016A3DB" name="Task 2 inside">
+      <incoming>sid-7B47A6F7-8DD3-49E2-BB36-1285793C5DC3</incoming>
+    <outgoing>sid-41844D5C-9EFB-4AA7-9B76-2918039F3251</outgoing>
+    <outgoing>sid-76F8128F-6FFD-4984-A798-1108D2C8C159</outgoing>
+    </task>
+  <endEvent id="sid-99241320-57A2-491A-832C-1C2DC05EBBBC" name="">
+      <incoming>sid-41844D5C-9EFB-4AA7-9B76-2918039F3251</incoming>
+    </endEvent>
+  <startEvent id="sid-BCEABD6B-306C-45E7-86FF-EF884208558D" name="" parallelMultiple="false" isInterrupting="true">
+      <outgoing>sid-20B65C75-8076-46D6-B6F5-4C2116DA021C</outgoing>
+    </startEvent>
+  <task id="sid-D919E95A-594C-42BB-8E62-A94F24B60DC4" name="Other Task 1 inside">
+      <incoming>sid-20B65C75-8076-46D6-B6F5-4C2116DA021C</incoming>
+    <outgoing>sid-AB6E07F5-4DA1-40E9-9247-2508A6236AF1</outgoing>
+    <outgoing>sid-004CA4F6-8C0A-4919-B930-2A1B67DD5DD1</outgoing>
+    </task>
+  <task id="sid-56091A6A-A06A-4ECA-9195-9F7270E7BA21" name="Other Task 2 inside">
+      <incoming>sid-AB6E07F5-4DA1-40E9-9247-2508A6236AF1</incoming>
+    <incoming>sid-76F8128F-6FFD-4984-A798-1108D2C8C159</incoming>
+    <outgoing>sid-BE926818-C636-4066-A89A-570BC67F3785</outgoing>
+    </task>
+  <endEvent id="sid-2E6AD687-A8BA-4913-ADA2-313BDD5EAD5B" name="">
+      <incoming>sid-BE926818-C636-4066-A89A-570BC67F3785</incoming>
+    </endEvent>
+  <startEvent id="sid-5393FE63-B0CB-49CB-A04A-7A7549D7D25C" name="" parallelMultiple="false" isInterrupting="true">
+      <outgoing>sid-27A66B62-CF28-4140-B016-B72008BD4C6D</outgoing>
+    </startEvent>
+  <task id="sid-583098EE-1C80-4B1F-8330-78CCA34FD836" name="Task 1 separate">
+      <incoming>sid-27A66B62-CF28-4140-B016-B72008BD4C6D</incoming>
+    <outgoing>sid-BB60DE23-F556-4B34-AEF9-1DD19BC4409D</outgoing>
+    </task>
+  <task id="sid-47D57197-A9AA-4F4D-B730-F349BC768F14" name="Task 2 separate">
+      <incoming>sid-BB60DE23-F556-4B34-AEF9-1DD19BC4409D</incoming>
+    <outgoing>sid-3CDDEBF4-7C16-4B8D-B2F8-1E10ADF8C0FD</outgoing>
+    </task>
+  <endEvent id="sid-B72C7DBA-B7CD-4AC0-B40E-8FEAE3B7B341" name="">
+      <incoming>sid-3CDDEBF4-7C16-4B8D-B2F8-1E10ADF8C0FD</incoming>
+    </endEvent>
+  <startEvent id="sid-CE74BFED-432E-4F9B-AC62-C8F06DD50F5D" name="" parallelMultiple="false" isInterrupting="true">
+      <outgoing>sid-F1B76470-BF6B-409C-B94C-E3DCC3DECB21</outgoing>
+    </startEvent>
+  <task id="sid-097D3D5E-CC5A-4F6D-B393-B6CF003688CB" name="Task 1 outside">
+      <incoming>sid-F1B76470-BF6B-409C-B94C-E3DCC3DECB21</incoming>
+    <outgoing>sid-F028F83C-51F1-4A65-B627-0C0EE874B4FE</outgoing>
+    </task>
+  <task id="sid-988C4FC2-A6A8-4DDB-8B4B-27112B3EDE38" name="Task 2 outside">
+      <incoming>sid-F028F83C-51F1-4A65-B627-0C0EE874B4FE</incoming>
+    <outgoing>sid-FBFBEE23-C8EA-44FB-B726-11DCE39D03B3</outgoing>
+    </task>
+  <endEvent id="sid-FEC43870-6945-4A1B-A73E-615F4BA5331D" name="">
+      <incoming>sid-FBFBEE23-C8EA-44FB-B726-11DCE39D03B3</incoming>
+    </endEvent>
+  <sequenceFlow id="sid-FF9C860C-4A3A-478C-9FF9-69493B7EDA2F" name="" sourceRef="sid-BF79F939-0C9A-493E-A191-D5EE2A6A097A" targetRef="sid-078314A2-6A2C-4359-B5D8-734E38F1974C" />
+  <sequenceFlow id="sid-7B47A6F7-8DD3-49E2-BB36-1285793C5DC3" name="" sourceRef="sid-078314A2-6A2C-4359-B5D8-734E38F1974C" targetRef="sid-5920B6C5-2430-439C-98B8-C84BA016A3DB" />
+  <sequenceFlow id="sid-004CA4F6-8C0A-4919-B930-2A1B67DD5DD1" name="" sourceRef="sid-D919E95A-594C-42BB-8E62-A94F24B60DC4" targetRef="sid-078314A2-6A2C-4359-B5D8-734E38F1974C" />
+  <sequenceFlow id="sid-41844D5C-9EFB-4AA7-9B76-2918039F3251" name="" sourceRef="sid-5920B6C5-2430-439C-98B8-C84BA016A3DB" targetRef="sid-99241320-57A2-491A-832C-1C2DC05EBBBC" />
+  <sequenceFlow id="sid-76F8128F-6FFD-4984-A798-1108D2C8C159" name="" sourceRef="sid-5920B6C5-2430-439C-98B8-C84BA016A3DB" targetRef="sid-56091A6A-A06A-4ECA-9195-9F7270E7BA21" />
+  <sequenceFlow id="sid-20B65C75-8076-46D6-B6F5-4C2116DA021C" name="" sourceRef="sid-BCEABD6B-306C-45E7-86FF-EF884208558D" targetRef="sid-D919E95A-594C-42BB-8E62-A94F24B60DC4" />
+  <sequenceFlow id="sid-AB6E07F5-4DA1-40E9-9247-2508A6236AF1" name="" sourceRef="sid-D919E95A-594C-42BB-8E62-A94F24B60DC4" targetRef="sid-56091A6A-A06A-4ECA-9195-9F7270E7BA21" />
+  <sequenceFlow id="sid-BE926818-C636-4066-A89A-570BC67F3785" name="" sourceRef="sid-56091A6A-A06A-4ECA-9195-9F7270E7BA21" targetRef="sid-2E6AD687-A8BA-4913-ADA2-313BDD5EAD5B" />
+  <sequenceFlow id="sid-27A66B62-CF28-4140-B016-B72008BD4C6D" name="" sourceRef="sid-5393FE63-B0CB-49CB-A04A-7A7549D7D25C" targetRef="sid-583098EE-1C80-4B1F-8330-78CCA34FD836" />
+  <sequenceFlow id="sid-BB60DE23-F556-4B34-AEF9-1DD19BC4409D" name="" sourceRef="sid-583098EE-1C80-4B1F-8330-78CCA34FD836" targetRef="sid-47D57197-A9AA-4F4D-B730-F349BC768F14" />
+  <sequenceFlow id="sid-3CDDEBF4-7C16-4B8D-B2F8-1E10ADF8C0FD" name="" sourceRef="sid-47D57197-A9AA-4F4D-B730-F349BC768F14" targetRef="sid-B72C7DBA-B7CD-4AC0-B40E-8FEAE3B7B341" />
+  <sequenceFlow id="sid-F1B76470-BF6B-409C-B94C-E3DCC3DECB21" name="" sourceRef="sid-CE74BFED-432E-4F9B-AC62-C8F06DD50F5D" targetRef="sid-097D3D5E-CC5A-4F6D-B393-B6CF003688CB" />
+  <sequenceFlow id="sid-F028F83C-51F1-4A65-B627-0C0EE874B4FE" name="" sourceRef="sid-097D3D5E-CC5A-4F6D-B393-B6CF003688CB" targetRef="sid-988C4FC2-A6A8-4DDB-8B4B-27112B3EDE38" />
+  <sequenceFlow id="sid-FBFBEE23-C8EA-44FB-B726-11DCE39D03B3" name="" sourceRef="sid-988C4FC2-A6A8-4DDB-8B4B-27112B3EDE38" targetRef="sid-FEC43870-6945-4A1B-A73E-615F4BA5331D" />
+  </process>
+</definitions>

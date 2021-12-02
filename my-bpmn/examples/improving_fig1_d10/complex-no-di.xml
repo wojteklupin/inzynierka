@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='utf-8'?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <process id="id7902738e-2345-4ec8-9541-452d97ef723c" isClosed="false" isExecutable="false" processType="None">
+    <startEvent id="idc9a3390c-402b-48d0-b7ba-bf2371bd9782" name="Start" parallelMultiple="false" isInterrupting="true">
+      <outgoing>id4dd15c95-893b-4f56-91c6-ebc249ec2140</outgoing>
+    </startEvent>
+  <task id="ide8384072-45b9-4b6a-b00f-f2d6c7de11e0" name="Task1">
+      <incoming>id4dd15c95-893b-4f56-91c6-ebc249ec2140</incoming>
+    <outgoing>idfd5280ea-7695-4e72-96cf-5410544b44d7</outgoing>
+    </task>
+  <exclusiveGateway id="idfd316101-d4e9-4ffc-b4f5-1932e0a9740b" name="Excl fork 1" gatewayDirection="Unspecified">
+      <incoming>idfd5280ea-7695-4e72-96cf-5410544b44d7</incoming>
+    <outgoing>id04d87573-61c2-4707-9467-08cdb4d8db41</outgoing>
+    <outgoing>id54ea1bd4-3c64-4008-b9e7-d5cd8adf8a30</outgoing>
+    </exclusiveGateway>
+  <task id="ideea68e36-6d2b-42db-839b-d8bf831b020c" name="Task 2a">
+      <incoming>id04d87573-61c2-4707-9467-08cdb4d8db41</incoming>
+    <outgoing>id5fc2de2c-182d-4d8f-af8f-d974b7216c78</outgoing>
+    </task>
+  <task id="id14ca0ff4-40b9-493f-a060-ceaa5bcbd9ca" name="Task 2b">
+      <incoming>id54ea1bd4-3c64-4008-b9e7-d5cd8adf8a30</incoming>
+    <outgoing>id0e56bf37-9f62-4c30-9586-0944c9e49adb</outgoing>
+    </task>
+  <exclusiveGateway id="id6f98044a-b912-4bb8-8e80-4dafd766735f" name="Excl join 1" gatewayDirection="Unspecified">
+      <incoming>id5fc2de2c-182d-4d8f-af8f-d974b7216c78</incoming>
+    <incoming>id0e56bf37-9f62-4c30-9586-0944c9e49adb</incoming>
+    <outgoing>id38d313f7-fea5-4091-95b2-222045ddade7</outgoing>
+    </exclusiveGateway>
+  <endEvent id="idb27b733a-4d65-4e53-8dcc-2e61a26bed07" name="End">
+      <incoming>id38d313f7-fea5-4091-95b2-222045ddade7</incoming>
+    </endEvent>
+  <sequenceFlow id="id4dd15c95-893b-4f56-91c6-ebc249ec2140" name="" sourceRef="idc9a3390c-402b-48d0-b7ba-bf2371bd9782" targetRef="ide8384072-45b9-4b6a-b00f-f2d6c7de11e0" />
+  <sequenceFlow id="idfd5280ea-7695-4e72-96cf-5410544b44d7" name="" sourceRef="ide8384072-45b9-4b6a-b00f-f2d6c7de11e0" targetRef="idfd316101-d4e9-4ffc-b4f5-1932e0a9740b" />
+  <sequenceFlow id="id04d87573-61c2-4707-9467-08cdb4d8db41" name="" sourceRef="idfd316101-d4e9-4ffc-b4f5-1932e0a9740b" targetRef="ideea68e36-6d2b-42db-839b-d8bf831b020c" />
+  <sequenceFlow id="id54ea1bd4-3c64-4008-b9e7-d5cd8adf8a30" name="" sourceRef="idfd316101-d4e9-4ffc-b4f5-1932e0a9740b" targetRef="id14ca0ff4-40b9-493f-a060-ceaa5bcbd9ca" />
+  <sequenceFlow id="id5fc2de2c-182d-4d8f-af8f-d974b7216c78" name="" sourceRef="ideea68e36-6d2b-42db-839b-d8bf831b020c" targetRef="id6f98044a-b912-4bb8-8e80-4dafd766735f" />
+  <sequenceFlow id="id0e56bf37-9f62-4c30-9586-0944c9e49adb" name="" sourceRef="id14ca0ff4-40b9-493f-a060-ceaa5bcbd9ca" targetRef="id6f98044a-b912-4bb8-8e80-4dafd766735f" />
+  <sequenceFlow id="id38d313f7-fea5-4091-95b2-222045ddade7" name="" sourceRef="id6f98044a-b912-4bb8-8e80-4dafd766735f" targetRef="idb27b733a-4d65-4e53-8dcc-2e61a26bed07" />
+  </process>
+</definitions>

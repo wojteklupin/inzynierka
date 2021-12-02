@@ -1,0 +1,19 @@
+krytyczne:
+    boundary events' bug - directory 'boundary_events'
+ważne:    
+    multiline diagrams
+    optimize searching corresponding split
+    finding corresponding split as an option
+    centering node even when not in one cell of grid
+    better handling of cycles - reverse not too many
+mało ważne:
+    sortowanie topologiczne ma niepotrzebny foreach w 11. linijce pseudokodu na overleaf
+
+overleaf:
+    krytyczne:
+        sprawdzic czy zmodyfikowane sortowanie topologiczne dziala prawidlowo
+    ważne:
+    mało ważne:
+        https://www.omg.org/spec/BPMN/2.0/PDF - to jest w bibliografii; sprawdz, czy jest tu wszystko co cytowalem w pracy
+        uzupelnic bibtex
+        outgoing_list w layouterze jest chyba zbedne - usunac

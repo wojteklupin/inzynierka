@@ -1,0 +1,30 @@
+G = [10,11,12,13,14,15]
+L = [11,12,14,10,13,15]
+S = []
+B = []
+
+while len(G) > 0:
+    for node n in G:
+        if n.incoming.len == 0:
+            S.append(n)
+    if len(S) > 0:
+        for n in S:
+            S.remove(n)
+            G.remove(n)
+            L.append(n)
+            for m: n -e-> m from G
+                G.remove(e)
+                G.decrement_incoming(m)
+    else:
+        for join j in G, classified with bmpn_graph:
+            if tmp_j.incoming < j.incoming:
+                break
+        for e in tmp_j.incoming_edges():
+            G.reverse(e)
+            B.append(reversed_e)
+
+        #for join j in G:
+            #for e in j.incoming_edges():
+                #G.remove(e)
+                
+L = [10,13,15,11,12,14]

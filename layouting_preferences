@@ -1,0 +1,14 @@
+vertical spacing: 50%
+horizontal spacing: 50%
+split with one activity in each branch: symmetrical
+
+split with unequal amount of activities in branches:
+    longer branch on bottom (even better pulled down)
+
+interleaving: don't keep branching height consistent with others - minimize it
+
+message flows: don't bend if possible
+               if not don't bend leftmost flows
+               bend only between pools
+               
+boundary events: better at bottom boundary (wedlug pdfa) (conclusion should be - don't place events at multiple boundaries) - do glebszego zastanowienia
