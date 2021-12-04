@@ -7,6 +7,7 @@ import copy
 import bpmn_python.bpmn_python_consts as consts
 import bpmn_python.grid_cell_class as cell_class
 
+
 def generate_layout(bpmn_graph, symmetric=True):
     """
     :param bpmn_graph: an instance of BPMNDiagramGraph class.
@@ -16,18 +17,24 @@ def generate_layout(bpmn_graph, symmetric=True):
     finished = []
     back_edges_ids = []
     for start_node in start_nodes:
-        classify_edges(start_node, bpmn_graph, discovered, finished, back_edges_ids)
+        classify_edges(start_node, bpmn_graph, discovered,
+                       finished, back_edges_ids)
 
     classification = generate_elements_clasification(bpmn_graph)
-    
-    (flows_copy_reversed, nodes_copy_reversed) = reverse_flows(bpmn_graph, classification[0], back_edges_ids)
-    (sorted_nodes_with_classification) = topological_sort(flows_copy_reversed, nodes_copy_reversed)
 
-    grid = grid_layout(flows_copy_reversed, sorted_nodes_with_classification, symmetric)
+    (flows_copy_reversed, nodes_copy_reversed) = reverse_flows(
+        bpmn_graph, classification[0], back_edges_ids)
+    (sorted_nodes_with_classification) = topological_sort(
+        flows_copy_reversed, nodes_copy_reversed)
+
+    grid = grid_layout(flows_copy_reversed,
+                       sorted_nodes_with_classification, symmetric)
     # interleave(grid)
 
     set_coordinates_for_nodes(bpmn_graph, grid)
-    set_flows_waypoints(bpmn_graph)
+    set_flows_waypoints(bpmn_graph, back_edges_ids,
+                        sorted_nodes_with_classification)
+
 
 def generate_elements_clasification(bpmn_graph):
     """
@@ -53,7 +60,8 @@ def generate_elements_clasification(bpmn_graph):
             tmp.append(classification_join)
         if len(element[1][consts.Consts.outgoing_flow]) >= 2:
             tmp.append(classification_split)
-        nodes_classification += [{node_param_name: element, classification_param_name: tmp}]
+        nodes_classification += [{node_param_name: element,
+                                  classification_param_name: tmp}]
 
     subprocess_list = bpmn_graph.get_nodes(consts.Consts.subprocess)
     for element in subprocess_list:
@@ -62,7 +70,8 @@ def generate_elements_clasification(bpmn_graph):
             tmp.append(classification_join)
         if len(element[1][consts.Consts.outgoing_flow]) >= 2:
             tmp.append(classification_split)
-        nodes_classification += [{node_param_name: element, classification_param_name: tmp}]
+        nodes_classification += [{node_param_name: element,
+                                  classification_param_name: tmp}]
 
     complex_gateway_list = bpmn_graph.get_nodes(consts.Consts.complex_gateway)
     for element in complex_gateway_list:
@@ -71,43 +80,52 @@ def generate_elements_clasification(bpmn_graph):
             tmp.append(classification_join)
         if len(element[1][consts.Consts.outgoing_flow]) >= 2:
             tmp.append(classification_split)
-        nodes_classification += [{node_param_name: element, classification_param_name: tmp}]
+        nodes_classification += [{node_param_name: element,
+                                  classification_param_name: tmp}]
 
-    event_based_gateway_list = bpmn_graph.get_nodes(consts.Consts.event_based_gateway)
+    event_based_gateway_list = bpmn_graph.get_nodes(
+        consts.Consts.event_based_gateway)
     for element in event_based_gateway_list:
         tmp = [classification_element]
         if len(element[1][consts.Consts.incoming_flow]) >= 2:
             tmp.append(classification_join)
         if len(element[1][consts.Consts.outgoing_flow]) >= 2:
             tmp.append(classification_split)
-        nodes_classification += [{node_param_name: element, classification_param_name: tmp}]
+        nodes_classification += [{node_param_name: element,
+                                  classification_param_name: tmp}]
 
-    inclusive_gateway_list = bpmn_graph.get_nodes(consts.Consts.inclusive_gateway)
+    inclusive_gateway_list = bpmn_graph.get_nodes(
+        consts.Consts.inclusive_gateway)
     for element in inclusive_gateway_list:
         tmp = [classification_element]
         if len(element[1][consts.Consts.incoming_flow]) >= 2:
             tmp.append(classification_join)
         if len(element[1][consts.Consts.outgoing_flow]) >= 2:
             tmp.append(classification_split)
-        nodes_classification += [{node_param_name: element, classification_param_name: tmp}]
+        nodes_classification += [{node_param_name: element,
+                                  classification_param_name: tmp}]
 
-    exclusive_gateway_list = bpmn_graph.get_nodes(consts.Consts.exclusive_gateway)
+    exclusive_gateway_list = bpmn_graph.get_nodes(
+        consts.Consts.exclusive_gateway)
     for element in exclusive_gateway_list:
         tmp = [classification_element]
         if len(element[1][consts.Consts.incoming_flow]) >= 2:
             tmp.append(classification_join)
         if len(element[1][consts.Consts.outgoing_flow]) >= 2:
             tmp.append(classification_split)
-        nodes_classification += [{node_param_name: element, classification_param_name: tmp}]
+        nodes_classification += [{node_param_name: element,
+                                  classification_param_name: tmp}]
 
-    parallel_gateway_list = bpmn_graph.get_nodes(consts.Consts.parallel_gateway)
+    parallel_gateway_list = bpmn_graph.get_nodes(
+        consts.Consts.parallel_gateway)
     for element in parallel_gateway_list:
         tmp = [classification_element]
         if len(element[1][consts.Consts.incoming_flow]) >= 2:
             tmp.append(classification_join)
         if len(element[1][consts.Consts.outgoing_flow]) >= 2:
             tmp.append(classification_split)
-        nodes_classification += [{node_param_name: element, classification_param_name: tmp}]
+        nodes_classification += [{node_param_name: element,
+                                  classification_param_name: tmp}]
 
     start_event_list = bpmn_graph.get_nodes(consts.Consts.start_event)
     for element in start_event_list:
@@ -116,16 +134,19 @@ def generate_elements_clasification(bpmn_graph):
             tmp.append(classification_join)
         if len(element[1][consts.Consts.outgoing_flow]) >= 2:
             tmp.append(classification_split)
-        nodes_classification += [{node_param_name: element, classification_param_name: tmp}]
+        nodes_classification += [{node_param_name: element,
+                                  classification_param_name: tmp}]
 
-    intermediate_catch_event_list = bpmn_graph.get_nodes(consts.Consts.intermediate_catch_event)
+    intermediate_catch_event_list = bpmn_graph.get_nodes(
+        consts.Consts.intermediate_catch_event)
     for element in intermediate_catch_event_list:
         tmp = [classification_element]
         if len(element[1][consts.Consts.incoming_flow]) >= 2:
             tmp.append(classification_join)
         if len(element[1][consts.Consts.outgoing_flow]) >= 2:
             tmp.append(classification_split)
-        nodes_classification += [{node_param_name: element, classification_param_name: tmp}]
+        nodes_classification += [{node_param_name: element,
+                                  classification_param_name: tmp}]
 
     end_event_list = bpmn_graph.get_nodes(consts.Consts.end_event)
     for element in end_event_list:
@@ -134,27 +155,33 @@ def generate_elements_clasification(bpmn_graph):
             tmp.append(classification_join)
         if len(element[1][consts.Consts.outgoing_flow]) >= 2:
             tmp.append(classification_split)
-        nodes_classification += [{node_param_name: element, classification_param_name: tmp}]
+        nodes_classification += [{node_param_name: element,
+                                  classification_param_name: tmp}]
 
-    intermediate_throw_event_list = bpmn_graph.get_nodes(consts.Consts.intermediate_throw_event)
+    intermediate_throw_event_list = bpmn_graph.get_nodes(
+        consts.Consts.intermediate_throw_event)
     for element in intermediate_throw_event_list:
         tmp = [classification_element]
         if len(element[1][consts.Consts.incoming_flow]) >= 2:
             tmp.append(classification_join)
         if len(element[1][consts.Consts.outgoing_flow]) >= 2:
             tmp.append(classification_split)
-        nodes_classification += [{node_param_name: element, classification_param_name: tmp}]
+        nodes_classification += [{node_param_name: element,
+                                  classification_param_name: tmp}]
 
     boundary_event_list = bpmn_graph.get_nodes(consts.Consts.boundary_event)
     for element in boundary_event_list:
-        nodes_classification += [{node_param_name: element, classification_param_name: [classification_boundary]}]
+        nodes_classification += [{node_param_name: element,
+                                  classification_param_name: [classification_boundary]}]
 
     flows_classification = []
     flows_list = bpmn_graph.get_flows()
     for flow in flows_list:
-        flows_classification += [{flow_param_name: flow, classification_param_name: ["Flow"]}]
+        flows_classification += [{flow_param_name: flow,
+                                  classification_param_name: ["Flow"]}]
 
     return nodes_classification, flows_classification
+
 
 def classify_edges(start_node, bpmn_graph, discovered, finished, back_edges_ids):
     discovered.append(start_node[0])
@@ -163,10 +190,12 @@ def classify_edges(start_node, bpmn_graph, discovered, finished, back_edges_ids)
         edge = bpmn_graph.sequence_flows[edge_id]
         successor_id = edge[consts.Consts.target_ref]
         if successor_id not in discovered:
-            classify_edges(bpmn_graph.get_node_by_id(successor_id), bpmn_graph, discovered, finished, back_edges_ids)
+            classify_edges(bpmn_graph.get_node_by_id(successor_id),
+                           bpmn_graph, discovered, finished, back_edges_ids)
         elif successor_id not in finished:
             back_edges_ids.append(edge_id)
     finished.append(start_node[0])
+
 
 def topological_sort(flows, tmp_nodes_with_classification):
     """
@@ -186,13 +215,15 @@ def topological_sort(flows, tmp_nodes_with_classification):
             flow_id = node[node_param_name][1][consts.Consts.outgoing_flow].pop()
             flows[flow_id][consts.Consts.source_ref] = attached_to_id
             attached_to = next(tmp_node for tmp_node in tmp_nodes_with_classification
-                if tmp_node[node_param_name][0] == attached_to_id)
-            attached_to[node_param_name][1][consts.Consts.outgoing_flow].append(flow_id)
+                               if tmp_node[node_param_name][0] == attached_to_id)
+            attached_to[node_param_name][1][consts.Consts.outgoing_flow].append(
+                flow_id)
             boundary_events.append(node)
 
     for boundary in boundary_events:
         tmp_nodes_with_classification.remove(boundary)
-    tmp_nodes_with_classification_copy = copy.deepcopy(tmp_nodes_with_classification)
+    tmp_nodes_with_classification_copy = copy.deepcopy(
+        tmp_nodes_with_classification)
 
     while tmp_nodes_with_classification:
         for node_with_classification in tmp_nodes_with_classification:
@@ -204,9 +235,10 @@ def topological_sort(flows, tmp_nodes_with_classification):
                 node_with_classification = no_incoming_flow_nodes.pop()
                 tmp_nodes_with_classification.remove(node_with_classification)
                 sorted_nodes_with_classification.append(next(tmp_node for tmp_node in tmp_nodes_with_classification_copy
-                        if tmp_node[node_param_name][0] == node_with_classification[node_param_name][0]))
+                                                             if tmp_node[node_param_name][0] == node_with_classification[node_param_name][0]))
 
-                outgoing_list = list(node_with_classification[node_param_name][1][consts.Consts.outgoing_flow])
+                outgoing_list = list(
+                    node_with_classification[node_param_name][1][consts.Consts.outgoing_flow])
                 tmp_outgoing_list = list(outgoing_list)
 
                 for flow_id in tmp_outgoing_list:
@@ -216,7 +248,8 @@ def topological_sort(flows, tmp_nodes_with_classification):
                     - Remove the incoming flow for target flow node
                     '''
                     outgoing_list.remove(flow_id)
-                    node_with_classification[node_param_name][1][consts.Consts.outgoing_flow].remove(flow_id)
+                    node_with_classification[node_param_name][1][consts.Consts.outgoing_flow].remove(
+                        flow_id)
 
                     flow = flows[flow_id]
                     target_id = flow[consts.Consts.target_ref]
@@ -242,7 +275,7 @@ def grid_layout(flows, sorted_nodes_with_classification, symmetric):
     while tmp_nodes_with_classification:
         node_with_classification = tmp_nodes_with_classification.pop(0)
         (grid, last_row, last_col, _) = place_element_in_grid(node_with_classification, grid, last_row, last_col,
-                                                           flows, tmp_nodes_with_classification, sorted_nodes_with_classification, symmetric)
+                                                              flows, tmp_nodes_with_classification, sorted_nodes_with_classification, symmetric)
     return grid
 
 
@@ -262,16 +295,22 @@ def reverse_flows(bpmn_graph, nodes_with_classification, back_edges_ids):
         target_finished = False
         for node in tmp_nodes_with_classification:
             if node[node_param_name][0] == source_id:
-                node[node_param_name][1][consts.Consts.outgoing_flow].remove(flow_id)
-                node[node_param_name][1][consts.Consts.incoming_flow].append(flow_id)
+                node[node_param_name][1][consts.Consts.outgoing_flow].remove(
+                    flow_id)
+                node[node_param_name][1][consts.Consts.incoming_flow].append(
+                    flow_id)
                 source_finished = True
             elif node[node_param_name][0] == target_id:
-                node[node_param_name][1][consts.Consts.incoming_flow].remove(flow_id)
-                node[node_param_name][1][consts.Consts.outgoing_flow].append(flow_id)
+                node[node_param_name][1][consts.Consts.incoming_flow].remove(
+                    flow_id)
+                node[node_param_name][1][consts.Consts.outgoing_flow].append(
+                    flow_id)
                 target_finished = True
-            if source_finished and target_finished: break
-        
+            if source_finished and target_finished:
+                break
+
     return (flows, tmp_nodes_with_classification)
+
 
 def place_element_in_grid(node_with_classification, grid, last_row, last_col, flows, nodes_with_classification, all_nodes_with_classification, symmetric, enforced_row_num=None):
     """
@@ -296,23 +335,29 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
         current_element_row = last_row
         current_element_col = last_col
         if enforced_row_num:
-            insert_into_grid(grid, enforced_row_num, current_element_col, node_id)
+            insert_into_grid(grid, enforced_row_num,
+                             current_element_col, node_id)
         else:
-            insert_into_grid(grid, current_element_row, current_element_col, node_id)
+            insert_into_grid(grid, current_element_row,
+                             current_element_col, node_id)
         last_row += consts.Consts.grid_column_width
-    elif len(node_with_classification[node_param_name][1][consts.Consts.incoming_flow]) == 1: # not join
+    # not join
+    elif len(node_with_classification[node_param_name][1][consts.Consts.incoming_flow]) == 1:
         # if node is not a Join, put it right from its predecessor (element should only have one predecessor)
         flow_id = incoming_flows[0]
         flow = flows[flow_id]
         predecessor_id = flow[consts.Consts.source_ref]
-        predecessor_cell = next(grid_cell for grid_cell in grid if grid_cell.node_id == predecessor_id)
+        predecessor_cell = next(
+            grid_cell for grid_cell in grid if grid_cell.node_id == predecessor_id)
         # insert into cell right from predecessor - no need to insert new column or row
         current_element_col = predecessor_cell.col + 1
         current_element_row = predecessor_cell.row
         if enforced_row_num is not None:
-            insert_into_grid(grid, enforced_row_num, current_element_col, node_id)
+            insert_into_grid(grid, enforced_row_num,
+                             current_element_col, node_id)
         else:
-            insert_into_grid(grid, current_element_row, current_element_col, node_id)
+            insert_into_grid(grid, current_element_row,
+                             current_element_col, node_id)
     # TODO consider rule for split/join node
     else:
         # find the rightmost predecessor - put into next column
@@ -331,7 +376,8 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
 
         # find corresponding split:
         if enforced_row_num is None:
-            previous_cell = next(node for node in all_nodes_with_classification if node[node_param_name][0] == predecessors_id_list[0])
+            previous_cell = next(
+                node for node in all_nodes_with_classification if node[node_param_name][0] == predecessors_id_list[0])
             forks = 1
             found = True
             while True:
@@ -340,7 +386,7 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
                 for flow_id in in_flows:
                     flow = flows[flow_id]
                     predecessors_ids.append(flow[consts.Consts.source_ref])
-                
+
                 successors_ids = []
                 out_flows = previous_cell[node_param_name][1][consts.Consts.outgoing_flow]
                 for flow_id in out_flows:
@@ -351,11 +397,13 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
                     forks += 1
                 if len(successors_ids) > 1:
                     forks -= 1
-                    
-                if forks == 0: break
+
+                if forks == 0:
+                    break
 
                 if len(predecessors_ids) > 0:
-                    previous_cell = next(node for node in all_nodes_with_classification if node[node_param_name][0] == predecessors_ids[0])
+                    previous_cell = next(
+                        node for node in all_nodes_with_classification if node[node_param_name][0] == predecessors_ids[0])
                 else:
                     found = False
                     break
@@ -371,13 +419,16 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
                         row_num_sum += grid_cell.row
                 current_element_row = row_num_sum // len(predecessors_id_list)
 
-            insert_into_grid(grid, current_element_row, current_element_col, node_id)
+            insert_into_grid(grid, current_element_row,
+                             current_element_col, node_id)
         else:
-            insert_into_grid(grid, enforced_row_num, current_element_col, node_id)
+            insert_into_grid(grid, enforced_row_num,
+                             current_element_col, node_id)
 
     shift = 0
     shift_all = 0
-    if len(node_with_classification[node_param_name][1][consts.Consts.outgoing_flow]) > 1: # if split
+    # if split
+    if len(node_with_classification[node_param_name][1][consts.Consts.outgoing_flow]) > 1:
         for grid_cell in grid:
             if grid_cell.node_id == node_with_classification[node_param_name][0]:
                 current_element_row = grid_cell.row
@@ -387,7 +438,7 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
             flow = flows[flow_id]
             successors_id_list.append(flow[consts.Consts.target_ref])
         successor_node_list = [successor_node for successor_node in nodes_with_classification
-                                      if successor_node[node_param_name][0] in successors_id_list]
+                               if successor_node[node_param_name][0] in successors_id_list]
         num_of_successors = len(successor_node_list)
 
         if num_of_successors != 0:
@@ -405,20 +456,20 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
                     # place element above split
                     successor_node = successor_node_list[index]
                     (grid, last_row, last_col, tmp_shift) = place_element_in_grid(successor_node, grid, last_row, last_col,
-                                                                    flows ,nodes_with_classification, all_nodes_with_classification, symmetric, current_element_row - ((centre - index - shift) * consts.Consts.grid_column_width))
+                                                                                  flows, nodes_with_classification, all_nodes_with_classification, symmetric, current_element_row - ((centre - index - shift) * consts.Consts.grid_column_width))
                     shift += tmp_shift
                     nodes_with_classification.remove(successor_node)
 
                 successor_node = successor_node_list[centre]
                 (grid, last_row, last_col, tmp_shift) = place_element_in_grid(successor_node, grid, last_row, last_col,
-                                                                flows ,nodes_with_classification, all_nodes_with_classification, symmetric, current_element_row + shift * consts.Consts.grid_column_width)
+                                                                              flows, nodes_with_classification, all_nodes_with_classification, symmetric, current_element_row + shift * consts.Consts.grid_column_width)
                 shift += tmp_shift
                 nodes_with_classification.remove(successor_node)
                 for index in range(centre + 1, num_of_successors):
                     # place element below split
                     successor_node = successor_node_list[index]
                     (grid, last_row, last_col, tmp_shift) = place_element_in_grid(successor_node, grid, last_row, last_col,
-                                                                    flows ,nodes_with_classification, all_nodes_with_classification, symmetric, current_element_row + ((index - centre + shift) * consts.Consts.grid_column_width))
+                                                                                  flows, nodes_with_classification, all_nodes_with_classification, symmetric, current_element_row + ((index - centre + shift) * consts.Consts.grid_column_width))
                     shift += tmp_shift
                     nodes_with_classification.remove(successor_node)
 
@@ -429,7 +480,7 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
                         # place element above split
                         successor_node = successor_node_list[index]
                         (grid, last_row, last_col, tmp_shift) = place_element_in_grid(successor_node, grid, last_row, last_col,
-                                                                        flows ,nodes_with_classification, all_nodes_with_classification, symmetric, current_element_row - ((centre - index - shift) * consts.Consts.grid_column_width))
+                                                                                      flows, nodes_with_classification, all_nodes_with_classification, symmetric, current_element_row - ((centre - index - shift) * consts.Consts.grid_column_width))
                         shift += tmp_shift
                         nodes_with_classification.remove(successor_node)
 
@@ -438,7 +489,7 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
                         successor_node = successor_node_list[index]
 
                         (grid, last_row, last_col, tmp_shift) = place_element_in_grid(successor_node, grid, last_row, last_col,
-                                                                        flows ,nodes_with_classification, all_nodes_with_classification, symmetric, current_element_row + (index - centre + shift + 1) * consts.Consts.grid_column_width)
+                                                                                      flows, nodes_with_classification, all_nodes_with_classification, symmetric, current_element_row + (index - centre + shift + 1) * consts.Consts.grid_column_width)
                         shift += tmp_shift
                         nodes_with_classification.remove(successor_node)
                 else:
@@ -447,21 +498,17 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
                         # place element above split
                         successor_node = successor_node_list[index]
                         (grid, last_row, last_col, tmp_shift) = place_element_in_grid(successor_node, grid, last_row, last_col,
-                                                                        flows, nodes_with_classification, all_nodes_with_classification, symmetric, current_element_row - ((centre - index - shift - 1) * consts.Consts.grid_column_width))
+                                                                                      flows, nodes_with_classification, all_nodes_with_classification, symmetric, current_element_row - ((centre - index - shift - 1) * consts.Consts.grid_column_width))
                         shift += tmp_shift
                         nodes_with_classification.remove(successor_node)
-
-
 
                     for index in range(centre, num_of_successors):
                         # place element below split
                         successor_node = successor_node_list[index]
                         (grid, last_row, last_col, tmp_shift) = place_element_in_grid(successor_node, grid, last_row, last_col,
-                                                                        flows, nodes_with_classification, all_nodes_with_classification, symmetric, current_element_row + (index - centre + shift + 1) * consts.Consts.grid_column_width)
+                                                                                      flows, nodes_with_classification, all_nodes_with_classification, symmetric, current_element_row + (index - centre + shift + 1) * consts.Consts.grid_column_width)
                         shift += tmp_shift
                         nodes_with_classification.remove(successor_node)
-
-
 
     return grid, last_row, last_col, shift + shift_all
 
@@ -477,6 +524,7 @@ def insert_into_grid(grid, row, col, node_id):
     # if row <= 0:
     #     row = 1
     grid.append(cell_class.GridCell(row, col, node_id))
+
 
 def partition(array, start, end):
     pivot = array[start].col
@@ -496,6 +544,7 @@ def partition(array, start, end):
 
     return high
 
+
 def sort(array, start, end):
     if start >= end:
         return
@@ -503,6 +552,7 @@ def sort(array, start, end):
     p = partition(array, start, end)
     sort(array, start, p-1)
     sort(array, p+1, end)
+
 
 def interleave(grid):
     """
@@ -573,6 +623,7 @@ def interleave(grid):
             rows[j-1] = rows.pop(j)
         last_row -= 1
 
+
 def set_coordinates_for_nodes(bpmn_graph, grid):
     """
 
@@ -583,82 +634,142 @@ def set_coordinates_for_nodes(bpmn_graph, grid):
     nodes = bpmn_graph.get_nodes()
     for node in nodes:
         try:
-            cell = next(grid_cell for grid_cell in grid if grid_cell.node_id == node[0])
-            node[1][consts.Consts.x] = str(cell.col * 150 + ( 100 - int(node[1][consts.Consts.width]) )//2 )
-            node[1][consts.Consts.y] = str(cell.row * 150 + ( 100 - int(node[1][consts.Consts.height]) )//2 )
-        except: # boundary events
+            cell = next(
+                grid_cell for grid_cell in grid if grid_cell.node_id == node[0])
+            node[1][consts.Consts.x] = str(
+                cell.col * 150 + (100 - int(node[1][consts.Consts.width]))//2)
+            node[1][consts.Consts.y] = str(
+                cell.row * 150 + (100 - int(node[1][consts.Consts.height]))//2)
+        except:  # boundary events
             pass
     boundary_events = bpmn_graph.get_nodes(consts.Consts.boundary_event)
     for boundary in boundary_events:
         attached_to_id = boundary[1][consts.Consts.attached_to_ref]
         attached_to = next(tmp_node for tmp_node in nodes
-            if tmp_node[0] == attached_to_id)
-        successor_id = bpmn_graph.get_flow_by_id(boundary[1][consts.Consts.outgoing_flow][0])[2][consts.Consts.target_ref]
+                           if tmp_node[0] == attached_to_id)
+        successor_id = bpmn_graph.get_flow_by_id(
+            boundary[1][consts.Consts.outgoing_flow][0])[2][consts.Consts.target_ref]
         successor = next(tmp_node for tmp_node in nodes
-            if tmp_node[0] == successor_id)
+                         if tmp_node[0] == successor_id)
 
-        successor_y_center = int(successor[1][consts.Consts.y]) + int(successor[1][consts.Consts.height])//2
-        att_y_center = int(attached_to[1][consts.Consts.y]) + int(attached_to[1][consts.Consts.height])//2
+        successor_y_center = int(
+            successor[1][consts.Consts.y]) + int(successor[1][consts.Consts.height])//2
+        att_y_center = int(
+            attached_to[1][consts.Consts.y]) + int(attached_to[1][consts.Consts.height])//2
         if att_y_center < successor_y_center:
-            boundary[1][consts.Consts.x] = str( int(attached_to[1][consts.Consts.x]) + 30 )
-            boundary[1][consts.Consts.y] = str( int(attached_to[1][consts.Consts.y]) + 80 )
+            boundary[1][consts.Consts.x] = str(
+                int(attached_to[1][consts.Consts.x]) + 30)
+            boundary[1][consts.Consts.y] = str(
+                int(attached_to[1][consts.Consts.y]) + 80)
         elif att_y_center == successor_y_center:
-            boundary[1][consts.Consts.x] = str( int(attached_to[1][consts.Consts.x]) + 80 )
-            boundary[1][consts.Consts.y] = str( int(attached_to[1][consts.Consts.y]) + 30 )
+            boundary[1][consts.Consts.x] = str(
+                int(attached_to[1][consts.Consts.x]) + 80)
+            boundary[1][consts.Consts.y] = str(
+                int(attached_to[1][consts.Consts.y]) + 30)
         else:
-            boundary[1][consts.Consts.x] = str( int(attached_to[1][consts.Consts.x]) + 30 )
-            boundary[1][consts.Consts.y] = str( int(attached_to[1][consts.Consts.y]) - 20 )
+            boundary[1][consts.Consts.x] = str(
+                int(attached_to[1][consts.Consts.x]) + 30)
+            boundary[1][consts.Consts.y] = str(
+                int(attached_to[1][consts.Consts.y]) - 20)
 
-def set_flows_waypoints(bpmn_graph):
+
+def set_flows_waypoints(bpmn_graph, back_edges_ids, reversed_nodes):
     """
 
     :param bpmn_graph:
     """
-    # TODO hardcoded node center, better compute it with x,y coordinates and height/width
     # TODO get rid of string cast
     flows = bpmn_graph.get_flows()
+    node_param_name = "node"
     for flow in flows:
-        source_node = bpmn_graph.get_node_by_id(flow[2][consts.Consts.source_ref])
+        if flow[2][consts.Consts.id] in back_edges_ids:
+            reversed = True
+            source_node = next(node for node in reversed_nodes if node[node_param_name][0] == flow[2][consts.Consts.target_ref])[node_param_name]
+            target_node = next(node for node in reversed_nodes if node[node_param_name][0] == flow[2][consts.Consts.source_ref])[node_param_name]
+        else:
+            reversed = False
+            source_node = next(node for node in reversed_nodes if node[node_param_name][0] == flow[2][consts.Consts.source_ref])[node_param_name]
+            target_node = next(node for node in reversed_nodes if node[node_param_name][0] == flow[2][consts.Consts.target_ref])[node_param_name]
         source_width = int(source_node[1][consts.Consts.width])
         source_height = int(source_node[1][consts.Consts.height])
+        source_x = int(source_node[1][consts.Consts.x])
+        source_y = int(source_node[1][consts.Consts.y])
 
-        target_node = bpmn_graph.get_node_by_id(flow[2][consts.Consts.target_ref])
         target_width = int(target_node[1][consts.Consts.width])
         target_height = int(target_node[1][consts.Consts.height])
-        if int(source_node[1][consts.Consts.y]) + int(source_node[1][consts.Consts.height])//2 == \
-        int(target_node[1][consts.Consts.y]) + int(target_node[1][consts.Consts.height])//2:
-            flow[2][consts.Consts.waypoints] = [(str(int(source_node[1][consts.Consts.x]) + source_width),
-                                                str(int(source_node[1][consts.Consts.y]) + source_height // 2)),
-                                            (str(int(target_node[1][consts.Consts.x])),
-                                                str(int(target_node[1][consts.Consts.y]) + target_height // 2))]
+        target_x = int(target_node[1][consts.Consts.x])
+        target_y = int(target_node[1][consts.Consts.y])
 
-        elif len(target_node[1][consts.Consts.incoming_flow]) > 1:
-            if int(target_node[1][consts.Consts.y]) > int(source_node[1][consts.Consts.y]):
-                offset = 0
+        if source_y + source_height//2 == target_y + target_height//2:
+            # TODO what if an element is between source and target?
+            if reversed:
+                flow[2][consts.Consts.waypoints] = [(str(target_x),
+                                                     str(target_y + target_height // 2)),
+                                                    (str(source_x + source_width),
+                                                     str(source_y + source_height // 2))]
             else:
-                offset = target_height
-            if int(target_node[1][consts.Consts.x]) < int(source_node[1][consts.Consts.x]):
-                offset2 = 0
+                flow[2][consts.Consts.waypoints] = [(str(source_x + source_width),
+                                                     str(source_y + source_height // 2)),
+                                                    (str(target_x),
+                                                     str(target_y + target_height // 2))]
+        elif source_y < target_y:
+            if len(source_node[1][consts.Consts.outgoing_flow]) > 1:  # split
+                if reversed:
+                    flow[2][consts.Consts.waypoints] = [(str(target_x),
+                                                         str(target_y + target_height // 2)),
+                                                        (str(source_x + source_width//2),
+                                                         str(target_y + target_height // 2)),
+                                                        (str(source_x + source_width//2), str(source_y + source_height))]
+                else:
+                    flow[2][consts.Consts.waypoints] = [(str(source_x + source_width//2),
+                                                         str(source_y + source_height)),
+                                                        (str(source_x + source_width//2),
+                                                         str(target_y + target_height // 2)),
+                                                        (str(target_x),
+                                                         str(target_y + target_height // 2))]
             else:
-                offset2 = source_width
-            flow[2][consts.Consts.waypoints] = [(str(int(source_node[1][consts.Consts.x]) + offset2),
-                                                str(int(source_node[1][consts.Consts.y]) + source_height // 2)),
-                                            (str(int(target_node[1][consts.Consts.x]) + target_width // 2),
-                                                str(int(source_node[1][consts.Consts.y]) + source_height // 2)),
-                                            (str(int(target_node[1][consts.Consts.x]) + target_width // 2),
-                                                str(int(target_node[1][consts.Consts.y]) + offset))]
+                if reversed:
+                    flow[2][consts.Consts.waypoints] = [(str(target_x + target_width//2),
+                                                     str(target_y)),
+                                                    (str(target_x + target_width//2),
+                                                     str(source_y + source_height//2)),
+                                                     (str(source_x + source_width),
+                                                     str(source_y + source_height//2))]
+                else:
+                    flow[2][consts.Consts.waypoints] = [(str(source_x + source_width),
+                                                     str(source_y + source_height//2)),
+                                                    (str(target_x + target_width//2),
+                                                     str(source_y + source_height//2)),
+                                                    (str(target_x + target_width//2),
+                                                     str(target_y))]
         else:
-            if int(target_node[1][consts.Consts.y]) > int(source_node[1][consts.Consts.y]):
-                offset = source_height
+            if len(source_node[1][consts.Consts.outgoing_flow]) > 1:  # split
+                if reversed:
+                    flow[2][consts.Consts.waypoints] = [(str(target_x),
+                                                        str(target_y + target_height // 2)),
+                                                        (str(source_x + source_width//2),
+                                                        str(target_y + target_height // 2)),
+                                                        (str(source_x + source_width//2),
+                                                        str(source_y))]
+                else:
+                    flow[2][consts.Consts.waypoints] = [(str(source_x + source_width//2),
+                                                        str(source_y)),
+                                                        (str(source_x + source_width//2),
+                                                        str(target_y + target_height // 2)),
+                                                        (str(target_x),
+                                                        str(target_y + target_height // 2))]
             else:
-                offset = 0
-            if int(target_node[1][consts.Consts.x]) < int(source_node[1][consts.Consts.x]):
-                offset2 = target_width
-            else:
-                offset2 = 0
-            flow[2][consts.Consts.waypoints] = [(str(int(source_node[1][consts.Consts.x]) + source_width // 2),
-                                                str(int(source_node[1][consts.Consts.y]) + offset)),
-                                            (str(int(source_node[1][consts.Consts.x]) + source_width // 2),
-                                                str(int(target_node[1][consts.Consts.y]) + target_height // 2)),
-                                            (str(int(target_node[1][consts.Consts.x]) + offset2),
-                                                str(int(target_node[1][consts.Consts.y]) + target_height // 2))]
+                if reversed:
+                    flow[2][consts.Consts.waypoints] = [(str(target_x + target_width//2),
+                                                        str(target_y + target_height)),
+                                                        (str(target_x + target_width//2),
+                                                        str(source_y + source_height//2)),
+                                                        (str(source_x + source_width),
+                                                        str(source_y + source_height//2))]
+                else:
+                    flow[2][consts.Consts.waypoints] = [(str(source_x + source_width),
+                                                        str(source_y + source_height//2)),
+                                                        (str(target_x + target_width//2),
+                                                        str(source_y + source_height//2)),
+                                                        (str(target_x + target_width//2),
+                                                        str(target_y + target_height))]
