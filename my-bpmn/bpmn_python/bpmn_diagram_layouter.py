@@ -12,18 +12,34 @@ def generate_layout(bpmn_graph, symmetric=True):
     """
     :param bpmn_graph: an instance of BPMNDiagramGraph class.
     """
-    start_nodes = bpmn_graph.get_nodes(consts.Consts.start_event)
-    discovered = []
-    finished = []
-    back_edges_ids = []
-    for start_node in start_nodes:
-        classify_edges(start_node, bpmn_graph, discovered,
-                       finished, back_edges_ids)
 
     classification = generate_elements_clasification(bpmn_graph)
 
-    (flows_copy_reversed, nodes_copy_reversed) = reverse_flows(
-        bpmn_graph, classification[0], back_edges_ids)
+    nodes_copy_reversed = copy.deepcopy(classification[0])
+    flows_copy_reversed = copy.deepcopy(bpmn_graph.sequence_flows)
+
+    start_nodes = []
+    for node in classification[0]:
+        if "Start Event" in node['classification']:
+            start_nodes.append(node)
+
+    back_edges_ids = []
+
+    reversed_anything = True
+    while reversed_anything:
+        discovered = []
+        finished = []
+        iteration_back_edges_ids = []
+        for start_node in start_nodes:
+            classify_edges(start_node, flows_copy_reversed, nodes_copy_reversed, discovered,
+                        finished, iteration_back_edges_ids)
+        reverse_flows(flows_copy_reversed, nodes_copy_reversed, iteration_back_edges_ids)
+        if iteration_back_edges_ids:
+            reversed_anything = True
+            back_edges_ids += iteration_back_edges_ids
+        else:
+            reversed_anything = False
+
     (sorted_nodes_with_classification) = topological_sort(
         flows_copy_reversed, nodes_copy_reversed)
 
@@ -183,19 +199,27 @@ def generate_elements_clasification(bpmn_graph):
     return nodes_classification, flows_classification
 
 
-def classify_edges(start_node, bpmn_graph, discovered, finished, back_edges_ids):
-    discovered.append(start_node[0])
+def classify_edges(start_node, flows, nodes, discovered, finished, back_edges_ids):
+    discovered.append(start_node[consts.Consts.node][0])
+    reversed =  False
 
-    for edge_id in start_node[1][consts.Consts.outgoing_flow]:
-        edge = bpmn_graph.sequence_flows[edge_id]
+    for edge_id in start_node[consts.Consts.node][1][consts.Consts.outgoing_flow]:
+        edge = flows[edge_id]
         successor_id = edge[consts.Consts.target_ref]
         if successor_id not in discovered:
-            classify_edges(bpmn_graph.get_node_by_id(successor_id),
-                           bpmn_graph, discovered, finished, back_edges_ids)
+            successor = next(node for node in nodes if node[consts.Consts.node][0] == successor_id)
+            reversed = classify_edges(successor, flows, nodes, discovered, finished, back_edges_ids)
+            if reversed:
+                back_edges_ids.append(edge_id)
+                if len(start_node[consts.Consts.node][1][consts.Consts.outgoing_flow]) > 1:
+                    reversed = False
         elif successor_id not in finished:
             back_edges_ids.append(edge_id)
-    finished.append(start_node[0])
-
+            reversed = True
+            if len(start_node[consts.Consts.node][1][consts.Consts.outgoing_flow]) > 1:
+                reversed = False
+    finished.append(start_node[consts.Consts.node][0])
+    return reversed
 
 def topological_sort(flows, tmp_nodes_with_classification):
     """
@@ -279,10 +303,7 @@ def grid_layout(flows, sorted_nodes_with_classification, symmetric):
     return grid
 
 
-def reverse_flows(bpmn_graph, nodes_with_classification, back_edges_ids):
-    tmp_nodes_with_classification = copy.deepcopy(nodes_with_classification)
-    flows = copy.deepcopy(bpmn_graph.sequence_flows)
-
+def reverse_flows(flows, tmp_nodes_with_classification, back_edges_ids):
     node_param_name = "node"
     for flow_id in back_edges_ids:
         flow = flows[flow_id]
@@ -308,9 +329,6 @@ def reverse_flows(bpmn_graph, nodes_with_classification, back_edges_ids):
                 target_finished = True
             if source_finished and target_finished:
                 break
-
-    return (flows, tmp_nodes_with_classification)
-
 
 def place_element_in_grid(node_with_classification, grid, last_row, last_col, flows, nodes_with_classification, all_nodes_with_classification, symmetric, enforced_row_num=None):
     """
@@ -684,12 +702,26 @@ def set_flows_waypoints(bpmn_graph, back_edges_ids, reversed_nodes):
     for flow in flows:
         if flow[2][consts.Consts.id] in back_edges_ids:
             reversed = True
-            source_node = next(node for node in reversed_nodes if node[node_param_name][0] == flow[2][consts.Consts.target_ref])[node_param_name]
-            target_node = next(node for node in reversed_nodes if node[node_param_name][0] == flow[2][consts.Consts.source_ref])[node_param_name]
+            source_node = bpmn_graph.get_node_by_id(flow[2][consts.Consts.target_ref])
+            try:
+                source_node_copy = next(node for node in reversed_nodes if node[node_param_name][0] == flow[2][consts.Consts.target_ref])[node_param_name]
+                source_outgoing = len(source_node_copy[1][consts.Consts.outgoing_flow])
+            except StopIteration: # boundary event
+                attached_to_id = source_node[1][consts.Consts.attached_to_ref]
+                attached_to = next(tmp_node for tmp_node in reversed_nodes if tmp_node[node_param_name][0] == attached_to_id)[node_param_name]
+                source_outgoing = len(attached_to[1][consts.Consts.outgoing_flow])
+            target_node = bpmn_graph.get_node_by_id(flow[2][consts.Consts.source_ref])
         else:
             reversed = False
-            source_node = next(node for node in reversed_nodes if node[node_param_name][0] == flow[2][consts.Consts.source_ref])[node_param_name]
-            target_node = next(node for node in reversed_nodes if node[node_param_name][0] == flow[2][consts.Consts.target_ref])[node_param_name]
+            source_node = bpmn_graph.get_node_by_id(flow[2][consts.Consts.source_ref])
+            try:
+                source_node_copy = next(node for node in reversed_nodes if node[node_param_name][0] == flow[2][consts.Consts.source_ref])[node_param_name]
+                source_outgoing = len(source_node_copy[1][consts.Consts.outgoing_flow])
+            except StopIteration: # boundary event
+                attached_to_id = source_node[1][consts.Consts.attached_to_ref]
+                attached_to = next(tmp_node for tmp_node in reversed_nodes if tmp_node[node_param_name][0] == attached_to_id)[node_param_name]
+                source_outgoing = len(attached_to[1][consts.Consts.outgoing_flow])
+            target_node = bpmn_graph.get_node_by_id(flow[2][consts.Consts.target_ref])
         source_width = int(source_node[1][consts.Consts.width])
         source_height = int(source_node[1][consts.Consts.height])
         source_x = int(source_node[1][consts.Consts.x])
@@ -713,7 +745,7 @@ def set_flows_waypoints(bpmn_graph, back_edges_ids, reversed_nodes):
                                                     (str(target_x),
                                                      str(target_y + target_height // 2))]
         elif source_y < target_y:
-            if len(source_node[1][consts.Consts.outgoing_flow]) > 1:  # split
+            if source_outgoing > 1:  # split
                 if reversed:
                     flow[2][consts.Consts.waypoints] = [(str(target_x),
                                                          str(target_y + target_height // 2)),
@@ -743,7 +775,7 @@ def set_flows_waypoints(bpmn_graph, back_edges_ids, reversed_nodes):
                                                     (str(target_x + target_width//2),
                                                      str(target_y))]
         else:
-            if len(source_node[1][consts.Consts.outgoing_flow]) > 1:  # split
+            if source_outgoing > 1:  # split
                 if reversed:
                     flow[2][consts.Consts.waypoints] = [(str(target_x),
                                                         str(target_y + target_height // 2)),

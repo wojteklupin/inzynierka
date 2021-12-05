@@ -12,6 +12,7 @@ class Consts(object):
     id = "id"
     name = "name"
     # Flow nodes cannot use "name" parameter in dictionary, due to the errors with PyDot
+    node = "node"
     node_name = "node_name"
     gateway_direction = "gatewayDirection"
     default = "default"

@@ -20,3 +20,4 @@ def classify_edges(start_node, discovered, finished, back_edges):
     return reversed
 
 # nie zapomnij zmienic liste back_edges na np. mapę true/false
+# petla nieskonczona!
