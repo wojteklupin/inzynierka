@@ -8,7 +8,7 @@ import bpmn_python.bpmn_python_consts as consts
 import bpmn_python.grid_cell_class as cell_class
 
 
-def generate_layout(bpmn_graph, symmetric=True):
+def generate_layout(bpmn_graph, symmetric=False):
     """
     :param bpmn_graph: an instance of BPMNDiagramGraph class.
     """
@@ -36,7 +36,11 @@ def generate_layout(bpmn_graph, symmetric=True):
         reverse_flows(flows_copy_reversed, nodes_copy_reversed, iteration_back_edges_ids)
         if iteration_back_edges_ids:
             reversed_anything = True
-            back_edges_ids += iteration_back_edges_ids
+            for back_edge_id in iteration_back_edges_ids:
+                if back_edge_id in back_edges_ids:
+                    back_edges_ids.remove(back_edge_id)
+                else:
+                    back_edges_ids.append(back_edge_id)
         else:
             reversed_anything = False
 
@@ -203,20 +207,29 @@ def classify_edges(start_node, flows, nodes, discovered, finished, back_edges_id
     discovered.append(start_node[consts.Consts.node][0])
     reversed =  False
 
-    for edge_id in start_node[consts.Consts.node][1][consts.Consts.outgoing_flow]:
+    start_node_outflows = start_node[consts.Consts.node][1][consts.Consts.outgoing_flow]
+    for edge_id in start_node_outflows:
         edge = flows[edge_id]
         successor_id = edge[consts.Consts.target_ref]
         if successor_id not in discovered:
             successor = next(node for node in nodes if node[consts.Consts.node][0] == successor_id)
             reversed = classify_edges(successor, flows, nodes, discovered, finished, back_edges_ids)
             if reversed:
-                back_edges_ids.append(edge_id)
-                if len(start_node[consts.Consts.node][1][consts.Consts.outgoing_flow]) > 1:
+                start_node_out_count = len(start_node_outflows)
+                for back_edge_id in back_edges_ids:
+                    if back_edge_id in start_node_outflows:
+                        start_node_out_count -= 1
+                if start_node_out_count > 1:
                     reversed = False
+                back_edges_ids.append(edge_id)
         elif successor_id not in finished:
             back_edges_ids.append(edge_id)
             reversed = True
-            if len(start_node[consts.Consts.node][1][consts.Consts.outgoing_flow]) > 1:
+            start_node_out_count = len(start_node_outflows)
+            for back_edge_id in back_edges_ids:
+                if back_edge_id in start_node_outflows:
+                    start_node_out_count -= 1
+            if start_node_out_count > 0: # start_node_out_count + 1 > 1 because one edge (main loop) is important
                 reversed = False
     finished.append(start_node[consts.Consts.node][0])
     return reversed

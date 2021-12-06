@@ -9,7 +9,7 @@ output_dot_file = "complex"
 output_png_file = "complex"
 
 bpmn_graph = diagram.BpmnDiagramGraph()
-bpmn_graph.create_new_diagram_graph(diagram_name="nested")
+bpmn_graph.create_new_diagram_graph(diagram_name="crossing")
 process_id = bpmn_graph.add_process_to_diagram()
 
 [start_id, _] = bpmn_graph.add_start_event_to_diagram(process_id, start_event_name="Start")
@@ -24,14 +24,17 @@ process_id = bpmn_graph.add_process_to_diagram()
 [end_id, _] = bpmn_graph.add_end_event_to_diagram(process_id, end_event_name="End")
 
 bpmn_graph.add_sequence_flow_to_diagram(process_id, start_id, task1_id)
+
 bpmn_graph.add_sequence_flow_to_diagram(process_id, task1_id, task2_id)
-bpmn_graph.add_sequence_flow_to_diagram(process_id, task2_id, task3_id)
+bpmn_graph.add_sequence_flow_to_diagram(process_id, task1_id, task3_id)
+bpmn_graph.add_sequence_flow_to_diagram(process_id, task2_id, task4_id)
+bpmn_graph.add_sequence_flow_to_diagram(process_id, task2_id, task5_id)
 bpmn_graph.add_sequence_flow_to_diagram(process_id, task3_id, task4_id)
-bpmn_graph.add_sequence_flow_to_diagram(process_id, task4_id, task5_id)
+bpmn_graph.add_sequence_flow_to_diagram(process_id, task3_id, task5_id)
+bpmn_graph.add_sequence_flow_to_diagram(process_id, task4_id, task6_id)
 bpmn_graph.add_sequence_flow_to_diagram(process_id, task5_id, task6_id)
-bpmn_graph.add_sequence_flow_to_diagram(process_id, task6_id, task1_id)
-bpmn_graph.add_sequence_flow_to_diagram(process_id, task6_id, task4_id)
-bpmn_graph.add_sequence_flow_to_diagram(process_id, task3_id, end_id)
+
+bpmn_graph.add_sequence_flow_to_diagram(process_id, task6_id, end_id)
 
 layouter.generate_layout(bpmn_graph)
 

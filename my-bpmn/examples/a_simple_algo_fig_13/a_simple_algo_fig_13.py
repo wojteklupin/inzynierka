@@ -61,7 +61,7 @@ bpmn_graph.add_sequence_flow_to_diagram(process_id, logout_id, end_id1)
 bpmn_graph.add_sequence_flow_to_diagram(process_id, timer_boundary_id, cancel_id)
 bpmn_graph.add_sequence_flow_to_diagram(process_id, cancel_id, end_id2)
 
-layouter.generate_layout(bpmn_graph, symmetric=True)
+layouter.generate_layout(bpmn_graph)
 
 bpmn_graph.export_xml_file(output_directory, output_file_with_di)
 bpmn_graph.export_xml_file_no_di(output_directory, output_file_no_di)
