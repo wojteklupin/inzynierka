@@ -296,26 +296,6 @@ def topological_sort(flows, tmp_nodes_with_classification):
                     target[1][consts.Consts.incoming_flow].remove(flow_id)
     return sorted_nodes_with_classification
 
-
-def grid_layout(flows, sorted_nodes_with_classification, symmetric):
-    """
-
-    :param sorted_nodes_with_classification:
-    :param bpmn_graph:
-    :return:
-    """
-    tmp_nodes_with_classification = list(sorted_nodes_with_classification)
-
-    last_row = consts.Consts.grid_column_width
-    last_col = 1
-    grid = []
-    while tmp_nodes_with_classification:
-        node_with_classification = tmp_nodes_with_classification.pop(0)
-        (grid, last_row, last_col, _) = place_element_in_grid(node_with_classification, grid, last_row, last_col,
-                                                              flows, tmp_nodes_with_classification, sorted_nodes_with_classification, symmetric)
-    return grid
-
-
 def reverse_flows(flows, tmp_nodes_with_classification, back_edges_ids):
     node_param_name = "node"
     for flow_id in back_edges_ids:
@@ -342,6 +322,24 @@ def reverse_flows(flows, tmp_nodes_with_classification, back_edges_ids):
                 target_finished = True
             if source_finished and target_finished:
                 break
+
+def grid_layout(flows, sorted_nodes_with_classification, symmetric):
+    """
+
+    :param sorted_nodes_with_classification:
+    :param bpmn_graph:
+    :return:
+    """
+    tmp_nodes_with_classification = list(sorted_nodes_with_classification)
+
+    last_row = consts.Consts.grid_column_width
+    last_col = 1
+    grid = []
+    while tmp_nodes_with_classification:
+        node_with_classification = tmp_nodes_with_classification.pop(0)
+        (grid, last_row, last_col, _) = place_element_in_grid(node_with_classification, grid, last_row, last_col,
+                                                              flows, tmp_nodes_with_classification, sorted_nodes_with_classification, symmetric)
+    return grid
 
 def place_element_in_grid(node_with_classification, grid, last_row, last_col, flows, nodes_with_classification, all_nodes_with_classification, symmetric, enforced_row_num=None):
     """

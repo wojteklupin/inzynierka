@@ -55,7 +55,7 @@ bpmn_graph.add_sequence_flow_to_diagram(process_id, task10_id, exc_join2_id)
 bpmn_graph.add_sequence_flow_to_diagram(process_id, exc_join2_id, task6_id)
 bpmn_graph.add_sequence_flow_to_diagram(process_id, task5_id, end_id)
 
-layouter.generate_layout(bpmn_graph, symmetric=True)
+layouter.generate_layout(bpmn_graph)
 
 bpmn_graph.export_xml_file(output_directory, output_file_with_di)
 # bpmn_graph.export_xml_file_no_di(output_directory, output_file_no_di)
