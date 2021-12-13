@@ -49,7 +49,6 @@ def generate_layout(bpmn_graph, symmetric=False):
 
     grid = grid_layout(flows_copy_reversed,
                        sorted_nodes_with_classification, symmetric)
-    # interleave(grid)
 
     set_coordinates_for_nodes(bpmn_graph, grid)
     set_flows_waypoints(bpmn_graph, back_edges_ids,
@@ -335,13 +334,16 @@ def grid_layout(flows, sorted_nodes_with_classification, symmetric):
     last_row = consts.Consts.grid_column_width
     last_col = 1
     grid = []
+    nodes_hierarchy = [[]]
+    nesting_level = 0
+    branch_nr = -1
     while tmp_nodes_with_classification:
         node_with_classification = tmp_nodes_with_classification.pop(0)
-        (grid, last_row, last_col, _) = place_element_in_grid(node_with_classification, grid, last_row, last_col,
-                                                              flows, tmp_nodes_with_classification, sorted_nodes_with_classification, symmetric)
+        (grid, last_row, last_col, nesting_level, branch_nr) = place_element_in_grid(node_with_classification, grid, last_row, last_col,
+                                                              flows, tmp_nodes_with_classification, sorted_nodes_with_classification, nodes_hierarchy, nesting_level, branch_nr, symmetric)
     return grid
 
-def place_element_in_grid(node_with_classification, grid, last_row, last_col, flows, nodes_with_classification, all_nodes_with_classification, symmetric, enforced_row_num=None):
+def place_element_in_grid(node_with_classification, grid, last_row, last_col, flows, nodes_with_classification, all_nodes_with_classification, nodes_hierarchy, nesting_level, branch_nr, symmetric):
     """
 
     :param node_with_classification:
@@ -363,12 +365,12 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
         # if node has no incoming flow, put it in new row
         current_element_row = last_row
         current_element_col = last_col
-        if enforced_row_num:
-            insert_into_grid(grid, enforced_row_num,
-                             current_element_col, node_id)
-        else:
-            insert_into_grid(grid, current_element_row,
-                             current_element_col, node_id)
+        insert_into_grid(grid, current_element_row,
+                            current_element_col, node_id)
+        branch_nr += 1
+        nodes_hierarchy[nesting_level].append([node_with_classification])
+        node_with_classification[consts.Consts.nesting_level] = nesting_level
+        node_with_classification[consts.Consts.branch_nr] = branch_nr
         last_row += consts.Consts.grid_column_width
     # not join
     elif len(node_with_classification[node_param_name][1][consts.Consts.incoming_flow]) == 1:
@@ -381,14 +383,13 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
         # insert into cell right from predecessor - no need to insert new column or row
         current_element_col = predecessor_cell.col + 1
         current_element_row = predecessor_cell.row
-        if enforced_row_num is not None:
-            insert_into_grid(grid, enforced_row_num,
-                             current_element_col, node_id)
-        else:
-            insert_into_grid(grid, current_element_row,
-                             current_element_col, node_id)
+        insert_into_grid(grid, current_element_row,
+                            current_element_col, node_id)
+        nodes_hierarchy[nesting_level][branch_nr].append(node_with_classification)
+        node_with_classification[consts.Consts.nesting_level] = nesting_level
+        node_with_classification[consts.Consts.branch_nr] = branch_nr    
     # TODO consider rule for split/join node
-    else:
+    else: # join
         # find the rightmost predecessor - put into next column
         # if last_split was passed, use row number from it, otherwise compute mean from predecessors
         predecessors_id_list = []
@@ -404,58 +405,55 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
         current_element_col = max_col_num + 1
 
         # find corresponding split:
-        if enforced_row_num is None:
-            previous_cell = next(
-                node for node in all_nodes_with_classification if node[node_param_name][0] == predecessors_id_list[0])
-            forks = 1
-            found = True
-            while True:
-                predecessors_ids = []
-                in_flows = previous_cell[node_param_name][1][consts.Consts.incoming_flow]
-                for flow_id in in_flows:
-                    flow = flows[flow_id]
-                    predecessors_ids.append(flow[consts.Consts.source_ref])
+        previous_cell = next(
+            node for node in all_nodes_with_classification if node[node_param_name][0] == predecessors_id_list[0])
+        forks = 1
+        found = True
+        while True:
+            predecessors_ids = []
+            in_flows = previous_cell[node_param_name][1][consts.Consts.incoming_flow]
+            for flow_id in in_flows:
+                flow = flows[flow_id]
+                predecessors_ids.append(flow[consts.Consts.source_ref])
 
-                successors_ids = []
-                out_flows = previous_cell[node_param_name][1][consts.Consts.outgoing_flow]
-                for flow_id in out_flows:
-                    flow = flows[flow_id]
-                    successors_ids.append(flow[consts.Consts.target_ref])
+            successors_ids = []
+            out_flows = previous_cell[node_param_name][1][consts.Consts.outgoing_flow]
+            for flow_id in out_flows:
+                flow = flows[flow_id]
+                successors_ids.append(flow[consts.Consts.target_ref])
 
-                if len(predecessors_ids) > 1:
-                    forks += 1
-                if len(successors_ids) > 1:
-                    forks -= 1
+            if len(predecessors_ids) > 1:
+                forks += 1
+            if len(successors_ids) > 1:
+                forks -= 1
 
-                if forks == 0:
-                    break
+            if forks == 0:
+                break
 
-                if len(predecessors_ids) > 0:
-                    previous_cell = next(
-                        node for node in all_nodes_with_classification if node[node_param_name][0] == predecessors_ids[0])
-                else:
-                    found = False
-                    break
-
-            if found:
-                for grid_cell in grid:
-                    if grid_cell.node_id == previous_cell[node_param_name][0]:
-                        current_element_row = grid_cell.row
+            if len(predecessors_ids) > 0:
+                previous_cell = next(
+                    node for node in all_nodes_with_classification if node[node_param_name][0] == predecessors_ids[0])
             else:
-                row_num_sum = 0
-                for grid_cell in grid:
-                    if grid_cell.node_id in predecessors_id_list:
-                        row_num_sum += grid_cell.row
-                current_element_row = row_num_sum // len(predecessors_id_list)
+                found = False
+                break
 
-            insert_into_grid(grid, current_element_row,
-                             current_element_col, node_id)
+        if found:
+            for grid_cell in grid:
+                if grid_cell.node_id == previous_cell[node_param_name][0]:
+                    current_element_row = grid_cell.row
         else:
-            insert_into_grid(grid, enforced_row_num,
-                             current_element_col, node_id)
+            row_num_sum = 0
+            for grid_cell in grid:
+                if grid_cell.node_id in predecessors_id_list:
+                    row_num_sum += grid_cell.row
+            current_element_row = row_num_sum // len(predecessors_id_list)
+        insert_into_grid(grid, current_element_row,
+                            current_element_col, node_id)
+        nesting_level -= 1
+        nodes_hierarchy[nesting_level][branch_nr].append(node_with_classification)
+        node_with_classification[consts.Consts.nesting_level] = nesting_level
+        node_with_classification[consts.Consts.branch_nr] = branch_nr  
 
-    shift = 0
-    shift_all = 0
     # if split
     if len(node_with_classification[node_param_name][1][consts.Consts.outgoing_flow]) > 1:
         for grid_cell in grid:
@@ -539,7 +537,7 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
                         shift += tmp_shift
                         nodes_with_classification.remove(successor_node)
 
-    return grid, last_row, last_col, shift + shift_all
+    return grid, last_row, last_col, nesting_level, branch_nr
 
 
 def insert_into_grid(grid, row, col, node_id):
@@ -553,105 +551,6 @@ def insert_into_grid(grid, row, col, node_id):
     # if row <= 0:
     #     row = 1
     grid.append(cell_class.GridCell(row, col, node_id))
-
-
-def partition(array, start, end):
-    pivot = array[start].col
-    low = start + 1
-    high = end
-
-    while True:
-        while low <= high and array[high].col >= pivot:
-            high = high - 1
-        while low <= high and array[low].col <= pivot:
-            low = low + 1
-        if low <= high:
-            array[low], array[high] = array[high], array[low]
-        else:
-            break
-    array[start], array[high] = array[high], array[start]
-
-    return high
-
-
-def sort(array, start, end):
-    if start >= end:
-        return
-
-    p = partition(array, start, end)
-    sort(array, start, p-1)
-    sort(array, p+1, end)
-
-
-def interleave(grid):
-    """
-    :param grid:
-    """
-    rows = {}
-    first_row = 1
-    last_row = 1
-
-    for cell in grid:
-        if cell.row < first_row:
-            first_row = cell.row
-        elif cell.row > last_row:
-            last_row = cell.row
-        try:
-            rows[cell.row].append(cell)
-        except KeyError:
-            rows[cell.row] = [cell]
-
-    for row in rows.values():
-        sort(row, 0, len(row) - 1)
-
-    shift = 0
-    for i in range(first_row, last_row+1):
-        if i not in rows:
-            shift += 1
-        elif shift > 0:
-            for cell in rows[i]:
-                cell.row -= shift
-            rows[i-1] = rows.pop(i)
-    last_row -= shift
-
-    i = first_row
-    while i < last_row:
-        prev_row = rows[i]
-        next_row = rows[i+1]
-
-        j = 0
-        k = 0
-        continue_next_row = False
-        prev_len = len(prev_row)
-        next_len = len(next_row)
-        while j < prev_len and k < next_len:
-            col1 = prev_row[j].col
-            col2 = next_row[k].col
-            if col1 == col2:
-                i += 1
-                continue_next_row = True
-                break
-            elif col1 < col2:
-                j += 1
-            else:
-                k += 1
-        if continue_next_row:
-            continue
-        # interleaving needed:
-        # merge two rows:
-        for cell in rows[i+1]:
-            cell.row -= 1
-        rows[i] += rows[i+1]
-        sort(rows[i], 0, len(rows[i])-1)
-        del rows[i+1]
-
-        # shift all from below one row up:
-        for j in range(i+2, last_row+1):
-            for cell in rows[j]:
-                cell.row -= 1
-            rows[j-1] = rows.pop(j)
-        last_row -= 1
-
 
 def set_coordinates_for_nodes(bpmn_graph, grid):
     """

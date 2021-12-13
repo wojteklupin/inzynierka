@@ -64,8 +64,8 @@ bpmn_graph.add_sequence_flow_to_diagram(process_id, cancel_id, end_id2)
 layouter.generate_layout(bpmn_graph)
 
 bpmn_graph.export_xml_file(output_directory, output_file_with_di)
-bpmn_graph.export_xml_file_no_di(output_directory, output_file_no_di)
+#bpmn_graph.export_xml_file_no_di(output_directory, output_file_no_di)
 # Uncomment line below to get a simple view of created diagram
 # visualizer.visualize_diagram(bpmn_graph)
-visualizer.bpmn_diagram_to_dot_file(bpmn_graph, output_directory + output_dot_file)
-visualizer.bpmn_diagram_to_png(bpmn_graph, output_directory + output_png_file)
+#visualizer.bpmn_diagram_to_dot_file(bpmn_graph, output_directory + output_dot_file)
+#visualizer.bpmn_diagram_to_png(bpmn_graph, output_directory + output_png_file)
