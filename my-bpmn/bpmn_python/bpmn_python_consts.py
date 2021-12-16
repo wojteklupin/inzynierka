@@ -101,5 +101,4 @@ class Consts(object):
     definition_type = "definition_type"
 
     grid_column_width = 1
-    nesting_level = "nesting_level"
-    branch_nr = "branch_nr"
+    next_free_branch = "next_free_branch"

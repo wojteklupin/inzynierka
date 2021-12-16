@@ -12,13 +12,13 @@ bpmn_graph = diagram.BpmnDiagramGraph()
 bpmn_graph.create_new_diagram_graph(diagram_name="a_simple_algo_fig_13")
 process_id = bpmn_graph.add_process_to_diagram()
 
-[start_id, _] = bpmn_graph.add_start_event_to_diagram(process_id, start_event_name="start_event")
-[login_id, _] = bpmn_graph.add_task_to_diagram(process_id, task_name="Login")
+[start_id, _] = bpmn_graph.add_start_event_to_diagram(process_id, start_event_name="0")
+[login_id, _] = bpmn_graph.add_task_to_diagram(process_id, task_name="1")
 [timer_boundary_id, _] = bpmn_graph.add_boundary_event_to_task(process_id, login_id, "timer")
 [paral_fork1_id, _] = bpmn_graph.add_parallel_gateway_to_diagram(process_id,
     gateway_name="2")
-[show_new_msgs_id, _] = bpmn_graph.add_task_to_diagram(process_id, task_name="Show new messages")
-[show_new_tasks_id, _] = bpmn_graph.add_task_to_diagram(process_id, task_name="Show new tasks")
+[show_new_msgs_id, _] = bpmn_graph.add_task_to_diagram(process_id, task_name="4")
+[show_new_tasks_id, _] = bpmn_graph.add_task_to_diagram(process_id, task_name="5")
 [paral_join1_id, _] = bpmn_graph.add_parallel_gateway_to_diagram(process_id,
     gateway_name="7")
 
@@ -35,8 +35,8 @@ process_id = bpmn_graph.add_process_to_diagram()
 [logout_id, _] = bpmn_graph.add_task_to_diagram(process_id, task_name="11")
 [end_id1, _] = bpmn_graph.add_end_event_to_diagram(process_id, end_event_name="12")
 
-[cancel_id, _] = bpmn_graph.add_task_to_diagram(process_id, task_name="Cancel")
-[end_id2, _] = bpmn_graph.add_end_event_to_diagram(process_id, end_event_name="end_event2")
+[cancel_id, _] = bpmn_graph.add_task_to_diagram(process_id, task_name="3")
+[end_id2, _] = bpmn_graph.add_end_event_to_diagram(process_id, end_event_name="6")
 
 bpmn_graph.add_sequence_flow_to_diagram(process_id, start_id, login_id)
 bpmn_graph.add_sequence_flow_to_diagram(process_id, login_id, paral_fork1_id)

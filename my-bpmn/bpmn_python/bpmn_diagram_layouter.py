@@ -32,8 +32,9 @@ def generate_layout(bpmn_graph, symmetric=False):
         iteration_back_edges_ids = []
         for start_node in start_nodes:
             classify_edges(start_node, flows_copy_reversed, nodes_copy_reversed, discovered,
-                        finished, iteration_back_edges_ids)
-        reverse_flows(flows_copy_reversed, nodes_copy_reversed, iteration_back_edges_ids)
+                           finished, iteration_back_edges_ids)
+        reverse_flows(flows_copy_reversed, nodes_copy_reversed,
+                      iteration_back_edges_ids)
         if iteration_back_edges_ids:
             reversed_anything = True
             for back_edge_id in iteration_back_edges_ids:
@@ -204,15 +205,17 @@ def generate_elements_clasification(bpmn_graph):
 
 def classify_edges(start_node, flows, nodes, discovered, finished, back_edges_ids):
     discovered.append(start_node[consts.Consts.node][0])
-    reversed =  False
+    reversed = False
 
     start_node_outflows = start_node[consts.Consts.node][1][consts.Consts.outgoing_flow]
     for edge_id in start_node_outflows:
         edge = flows[edge_id]
         successor_id = edge[consts.Consts.target_ref]
         if successor_id not in discovered:
-            successor = next(node for node in nodes if node[consts.Consts.node][0] == successor_id)
-            reversed = classify_edges(successor, flows, nodes, discovered, finished, back_edges_ids)
+            successor = next(
+                node for node in nodes if node[consts.Consts.node][0] == successor_id)
+            reversed = classify_edges(
+                successor, flows, nodes, discovered, finished, back_edges_ids)
             if reversed:
                 start_node_out_count = len(start_node_outflows)
                 for back_edge_id in back_edges_ids:
@@ -228,10 +231,12 @@ def classify_edges(start_node, flows, nodes, discovered, finished, back_edges_id
             for back_edge_id in back_edges_ids:
                 if back_edge_id in start_node_outflows:
                     start_node_out_count -= 1
-            if start_node_out_count > 0: # start_node_out_count + 1 > 1 because one edge (main loop) is important
+            # start_node_out_count + 1 > 1 because one edge (main loop) is important
+            if start_node_out_count > 0:
                 reversed = False
     finished.append(start_node[consts.Consts.node][0])
     return reversed
+
 
 def topological_sort(flows, tmp_nodes_with_classification):
     """
@@ -295,6 +300,7 @@ def topological_sort(flows, tmp_nodes_with_classification):
                     target[1][consts.Consts.incoming_flow].remove(flow_id)
     return sorted_nodes_with_classification
 
+
 def reverse_flows(flows, tmp_nodes_with_classification, back_edges_ids):
     node_param_name = "node"
     for flow_id in back_edges_ids:
@@ -322,6 +328,7 @@ def reverse_flows(flows, tmp_nodes_with_classification, back_edges_ids):
             if source_finished and target_finished:
                 break
 
+
 def grid_layout(flows, sorted_nodes_with_classification, symmetric):
     """
 
@@ -334,16 +341,14 @@ def grid_layout(flows, sorted_nodes_with_classification, symmetric):
     last_row = consts.Consts.grid_column_width
     last_col = 1
     grid = []
-    nodes_hierarchy = [[]]
-    nesting_level = 0
-    branch_nr = -1
     while tmp_nodes_with_classification:
         node_with_classification = tmp_nodes_with_classification.pop(0)
-        (grid, last_row, last_col, nesting_level, branch_nr) = place_element_in_grid(node_with_classification, grid, last_row, last_col,
-                                                              flows, tmp_nodes_with_classification, sorted_nodes_with_classification, nodes_hierarchy, nesting_level, branch_nr, symmetric)
+        (grid, last_row, last_col) = place_element_in_grid(node_with_classification, grid, last_row, last_col,
+                                                           flows, tmp_nodes_with_classification, sorted_nodes_with_classification, symmetric)
     return grid
 
-def place_element_in_grid(node_with_classification, grid, last_row, last_col, flows, nodes_with_classification, all_nodes_with_classification, nodes_hierarchy, nesting_level, branch_nr, symmetric):
+
+def place_element_in_grid(node_with_classification, grid, last_row, last_col, flows, nodes_with_classification, all_nodes_with_classification, symmetric):
     """
 
     :param node_with_classification:
@@ -366,30 +371,120 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
         current_element_row = last_row
         current_element_col = last_col
         insert_into_grid(grid, current_element_row,
-                            current_element_col, node_id)
-        branch_nr += 1
-        nodes_hierarchy[nesting_level].append([node_with_classification])
-        node_with_classification[consts.Consts.nesting_level] = nesting_level
-        node_with_classification[consts.Consts.branch_nr] = branch_nr
+                         current_element_col, [last_row - 1], node_id)
         last_row += consts.Consts.grid_column_width
     # not join
-    elif len(node_with_classification[node_param_name][1][consts.Consts.incoming_flow]) == 1:
+    elif len(incoming_flows) == 1:
         # if node is not a Join, put it right from its predecessor (element should only have one predecessor)
         flow_id = incoming_flows[0]
         flow = flows[flow_id]
         predecessor_id = flow[consts.Consts.source_ref]
+        predecessor = next(
+            node for node in all_nodes_with_classification if node[node_param_name][0] == predecessor_id)
         predecessor_cell = next(
             grid_cell for grid_cell in grid if grid_cell.node_id == predecessor_id)
-        # insert into cell right from predecessor - no need to insert new column or row
-        current_element_col = predecessor_cell.col + 1
-        current_element_row = predecessor_cell.row
-        insert_into_grid(grid, current_element_row,
-                            current_element_col, node_id)
-        nodes_hierarchy[nesting_level][branch_nr].append(node_with_classification)
-        node_with_classification[consts.Consts.nesting_level] = nesting_level
-        node_with_classification[consts.Consts.branch_nr] = branch_nr    
+        predecessor_outs = len(
+            predecessor[node_param_name][1][consts.Consts.outgoing_flow])
+        if predecessor_outs == 1:  # predecessor is not split
+            # insert into cell right from predecessor - no need to insert new column or row
+            current_element_col = predecessor_cell.col + 1
+            current_element_row = predecessor_cell.row
+            insert_into_grid(grid, current_element_row,
+                             current_element_col, predecessor_cell.branches, node_id)
+        else:  # predecessor is split
+            if predecessor_cell.branches[-1] == 0:  # branches go 1 level up
+                if predecessor_outs == predecessor[consts.Consts.next_free_branch] or \
+                        (predecessor_outs == 2 and predecessor[consts.Consts.next_free_branch] == 1):  # last element
+                    if predecessor_outs % 2 == 0:  # non-symmetrical
+                        branches = predecessor_cell.branches + \
+                            [predecessor_outs//2 - 1]
+                    else:
+                        branches = predecessor_cell.branches + \
+                            [predecessor_outs//2]
+                    insert_into_grid(grid, predecessor_cell.row,
+                                     predecessor_cell.col + 1, branches, node_id)
+                else:
+                    current_element_col = predecessor_cell.col + 1
+                    if predecessor_outs % 2 == 0:  # non-symmetrical
+                        offset = predecessor[consts.Consts.next_free_branch] - \
+                            predecessor_outs//2
+                        if offset != 0:
+                            current_element_row = predecessor_cell.row + offset
+                            branches = predecessor_cell.branches + \
+                                [predecessor[consts.Consts.next_free_branch]]
+                            predecessor[consts.Consts.next_free_branch] += 1
+                        else:
+                            current_element_row = predecessor_cell.row + offset + 1
+                            branches = predecessor_cell.branches + \
+                                [predecessor[consts.Consts.next_free_branch] + 1]
+                            predecessor[consts.Consts.next_free_branch] += 2
+                        insert_into_grid(grid, current_element_row,
+                                         current_element_col, branches, node_id)
+                        shift_nodes(branches, predecessor_outs//2, grid)
+                    else:
+                        offset = predecessor[consts.Consts.next_free_branch] - \
+                            predecessor_outs//2
+                        if offset != 0:
+                            current_element_row = predecessor_cell.row + offset
+                            branches = predecessor_cell.branches + \
+                                [predecessor[consts.Consts.next_free_branch]]
+                            predecessor[consts.Consts.next_free_branch] += 1
+                        else:
+                            current_element_row = predecessor_cell.row + offset + 1
+                            branches = predecessor_cell.branches + \
+                                [predecessor[consts.Consts.next_free_branch] + 1]
+                            predecessor[consts.Consts.next_free_branch] += 2
+                        insert_into_grid(grid, current_element_row,
+                                         current_element_col, branches, node_id)
+                        shift_nodes(branches, predecessor_outs//2, grid)
+            else:
+                # last element
+                if predecessor_outs == predecessor[consts.Consts.next_free_branch]:
+                    if predecessor_outs % 2 == 0:  # non-symmetrical
+                        branches = predecessor_cell.branches + \
+                            [predecessor_outs//2 - 1]
+                    else:
+                        branches = predecessor_cell.branches + \
+                            [predecessor_outs//2]
+                    insert_into_grid(grid, predecessor_cell.row,
+                                     predecessor_cell.col + 1, branches, node_id)
+                else:
+                    current_element_col = predecessor_cell.col + 1
+                    if predecessor_outs % 2 == 0:  # non-symmetrical
+                        offset = 1 + \
+                            predecessor[consts.Consts.next_free_branch] - \
+                            predecessor_outs//2
+                        if offset != 0:
+                            current_element_row = predecessor_cell.row + offset
+                            branches = predecessor_cell.branches + \
+                                [predecessor[consts.Consts.next_free_branch]]
+                            predecessor[consts.Consts.next_free_branch] += 1
+                        else:
+                            current_element_row = predecessor_cell.row + offset + 1
+                            branches = predecessor_cell.branches + \
+                                [predecessor[consts.Consts.next_free_branch] + 1]
+                            predecessor[consts.Consts.next_free_branch] += 2
+                        insert_into_grid(grid, current_element_row,
+                                         current_element_col, branches, node_id)
+                        shift_nodes(branches, predecessor_outs//2 - 1, grid)
+                    else:
+                        offset = predecessor[consts.Consts.next_free_branch] - \
+                            predecessor_outs//2
+                        if offset != 0:
+                            current_element_row = predecessor_cell.row + offset
+                            branches = predecessor_cell.branches + \
+                                [predecessor[consts.Consts.next_free_branch]]
+                            predecessor[consts.Consts.next_free_branch] += 1
+                        else:
+                            current_element_row = predecessor_cell.row + offset + 1
+                            branches = predecessor_cell.branches + \
+                                [predecessor[consts.Consts.next_free_branch] + 1]
+                            predecessor[consts.Consts.next_free_branch] += 2
+                        insert_into_grid(grid, current_element_row,
+                                         current_element_col, branches, node_id)
+                        shift_nodes(branches, predecessor_outs//2, grid)
     # TODO consider rule for split/join node
-    else: # join
+    else:  # join
         # find the rightmost predecessor - put into next column
         # if last_split was passed, use row number from it, otherwise compute mean from predecessors
         predecessors_id_list = []
@@ -447,100 +542,54 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
                 if grid_cell.node_id in predecessors_id_list:
                     row_num_sum += grid_cell.row
             current_element_row = row_num_sum // len(predecessors_id_list)
+        branches = next(grid_cell for grid_cell in grid if grid_cell.node_id ==
+                        previous_cell[node_param_name][0]).branches
         insert_into_grid(grid, current_element_row,
-                            current_element_col, node_id)
-        nesting_level -= 1
-        nodes_hierarchy[nesting_level][branch_nr].append(node_with_classification)
-        node_with_classification[consts.Consts.nesting_level] = nesting_level
-        node_with_classification[consts.Consts.branch_nr] = branch_nr  
+                         current_element_col, branches, node_id)
+        # remove unneccesary finished branches
+        for cell in grid:
+            try:
+                if cell.branches[:len(branches)] == branches and len(cell.branches) > len(branches):
+                    del cell.branches
+            except AttributeError:
+                pass
 
     # if split
-    if len(node_with_classification[node_param_name][1][consts.Consts.outgoing_flow]) > 1:
-        for grid_cell in grid:
-            if grid_cell.node_id == node_with_classification[node_param_name][0]:
-                current_element_row = grid_cell.row
-                break
-        successors_id_list = []
-        for flow_id in outgoing_flows:
-            flow = flows[flow_id]
-            successors_id_list.append(flow[consts.Consts.target_ref])
-        successor_node_list = [successor_node for successor_node in nodes_with_classification
-                               if successor_node[node_param_name][0] in successors_id_list]
-        num_of_successors = len(successor_node_list)
+    if len(outgoing_flows) > 1:
+        node_with_classification[consts.Consts.next_free_branch] = 0
 
-        if num_of_successors != 0:
-            shift_all = num_of_successors // 2
-            for cell in grid:
-                if cell.row < current_element_row:
-                    cell.row -= shift_all
-                elif cell.row > current_element_row:
-                    cell.row += shift_all
-            if num_of_successors % 2 != 0:
-                # if number of successors is even, put one half over the split, second half below
-                # proceed with first half
-                centre = (num_of_successors // 2)
-                for index in range(0, centre):
-                    # place element above split
-                    successor_node = successor_node_list[index]
-                    (grid, last_row, last_col, tmp_shift) = place_element_in_grid(successor_node, grid, last_row, last_col,
-                                                                                  flows, nodes_with_classification, all_nodes_with_classification, symmetric, current_element_row - ((centre - index - shift) * consts.Consts.grid_column_width))
-                    shift += tmp_shift
-                    nodes_with_classification.remove(successor_node)
+    return grid, last_row, last_col
 
-                successor_node = successor_node_list[centre]
-                (grid, last_row, last_col, tmp_shift) = place_element_in_grid(successor_node, grid, last_row, last_col,
-                                                                              flows, nodes_with_classification, all_nodes_with_classification, symmetric, current_element_row + shift * consts.Consts.grid_column_width)
-                shift += tmp_shift
-                nodes_with_classification.remove(successor_node)
-                for index in range(centre + 1, num_of_successors):
-                    # place element below split
-                    successor_node = successor_node_list[index]
-                    (grid, last_row, last_col, tmp_shift) = place_element_in_grid(successor_node, grid, last_row, last_col,
-                                                                                  flows, nodes_with_classification, all_nodes_with_classification, symmetric, current_element_row + ((index - centre + shift) * consts.Consts.grid_column_width))
-                    shift += tmp_shift
-                    nodes_with_classification.remove(successor_node)
+def shift_nodes(branches, center, grid):
+    if branches[-1] < center:  # shift appropriate nodes up
+        for level in range(1, len(branches)):
+            slice = branches[:level]
+            slice[-1] -= 1
+            while slice[-1] >= 0:
+                for cell in grid:
+                    try:
+                        if cell.branches[:len(slice)] == slice:
+                            cell.row -= 1
+                    except AttributeError:
+                        pass
+                slice[-1] -= 1
+    elif branches[-1] > center: # shift appropriate nodes down
+        for level in range(1, len(branches)):
+            slice = branches[:level]
+            slice[-1] += 1
+            found = True
+            while found:
+                found = False
+                for cell in grid:
+                    try:
+                        if cell.branches[:len(slice)] == slice:
+                            found = True
+                            cell.row += 1
+                    except AttributeError:
+                        pass
+                slice[-1] += 1
 
-            else:
-                if symmetric:
-                    centre = (num_of_successors // 2)
-                    for index in range(0, centre):
-                        # place element above split
-                        successor_node = successor_node_list[index]
-                        (grid, last_row, last_col, tmp_shift) = place_element_in_grid(successor_node, grid, last_row, last_col,
-                                                                                      flows, nodes_with_classification, all_nodes_with_classification, symmetric, current_element_row - ((centre - index - shift) * consts.Consts.grid_column_width))
-                        shift += tmp_shift
-                        nodes_with_classification.remove(successor_node)
-
-                    for index in range(centre, num_of_successors):
-                        # place element below split
-                        successor_node = successor_node_list[index]
-
-                        (grid, last_row, last_col, tmp_shift) = place_element_in_grid(successor_node, grid, last_row, last_col,
-                                                                                      flows, nodes_with_classification, all_nodes_with_classification, symmetric, current_element_row + (index - centre + shift + 1) * consts.Consts.grid_column_width)
-                        shift += tmp_shift
-                        nodes_with_classification.remove(successor_node)
-                else:
-                    centre = (num_of_successors // 2)
-                    for index in range(0, centre):
-                        # place element above split
-                        successor_node = successor_node_list[index]
-                        (grid, last_row, last_col, tmp_shift) = place_element_in_grid(successor_node, grid, last_row, last_col,
-                                                                                      flows, nodes_with_classification, all_nodes_with_classification, symmetric, current_element_row - ((centre - index - shift - 1) * consts.Consts.grid_column_width))
-                        shift += tmp_shift
-                        nodes_with_classification.remove(successor_node)
-
-                    for index in range(centre, num_of_successors):
-                        # place element below split
-                        successor_node = successor_node_list[index]
-                        (grid, last_row, last_col, tmp_shift) = place_element_in_grid(successor_node, grid, last_row, last_col,
-                                                                                      flows, nodes_with_classification, all_nodes_with_classification, symmetric, current_element_row + (index - centre + shift + 1) * consts.Consts.grid_column_width)
-                        shift += tmp_shift
-                        nodes_with_classification.remove(successor_node)
-
-    return grid, last_row, last_col, nesting_level, branch_nr
-
-
-def insert_into_grid(grid, row, col, node_id):
+def insert_into_grid(grid, row, col, branches, node_id):
     """
 
     :param grid:
@@ -550,7 +599,8 @@ def insert_into_grid(grid, row, col, node_id):
     """
     # if row <= 0:
     #     row = 1
-    grid.append(cell_class.GridCell(row, col, node_id))
+    grid.append(cell_class.GridCell(row, col, branches, node_id))
+
 
 def set_coordinates_for_nodes(bpmn_graph, grid):
     """
@@ -612,26 +662,38 @@ def set_flows_waypoints(bpmn_graph, back_edges_ids, reversed_nodes):
     for flow in flows:
         if flow[2][consts.Consts.id] in back_edges_ids:
             reversed = True
-            source_node = bpmn_graph.get_node_by_id(flow[2][consts.Consts.target_ref])
+            source_node = bpmn_graph.get_node_by_id(
+                flow[2][consts.Consts.target_ref])
             try:
-                source_node_copy = next(node for node in reversed_nodes if node[node_param_name][0] == flow[2][consts.Consts.target_ref])[node_param_name]
-                source_outgoing = len(source_node_copy[1][consts.Consts.outgoing_flow])
-            except StopIteration: # boundary event
+                source_node_copy = next(
+                    node for node in reversed_nodes if node[node_param_name][0] == flow[2][consts.Consts.target_ref])[node_param_name]
+                source_outgoing = len(
+                    source_node_copy[1][consts.Consts.outgoing_flow])
+            except StopIteration:  # boundary event
                 attached_to_id = source_node[1][consts.Consts.attached_to_ref]
-                attached_to = next(tmp_node for tmp_node in reversed_nodes if tmp_node[node_param_name][0] == attached_to_id)[node_param_name]
-                source_outgoing = len(attached_to[1][consts.Consts.outgoing_flow])
-            target_node = bpmn_graph.get_node_by_id(flow[2][consts.Consts.source_ref])
+                attached_to = next(tmp_node for tmp_node in reversed_nodes if tmp_node[node_param_name][0] == attached_to_id)[
+                    node_param_name]
+                source_outgoing = len(
+                    attached_to[1][consts.Consts.outgoing_flow])
+            target_node = bpmn_graph.get_node_by_id(
+                flow[2][consts.Consts.source_ref])
         else:
             reversed = False
-            source_node = bpmn_graph.get_node_by_id(flow[2][consts.Consts.source_ref])
+            source_node = bpmn_graph.get_node_by_id(
+                flow[2][consts.Consts.source_ref])
             try:
-                source_node_copy = next(node for node in reversed_nodes if node[node_param_name][0] == flow[2][consts.Consts.source_ref])[node_param_name]
-                source_outgoing = len(source_node_copy[1][consts.Consts.outgoing_flow])
-            except StopIteration: # boundary event
+                source_node_copy = next(
+                    node for node in reversed_nodes if node[node_param_name][0] == flow[2][consts.Consts.source_ref])[node_param_name]
+                source_outgoing = len(
+                    source_node_copy[1][consts.Consts.outgoing_flow])
+            except StopIteration:  # boundary event
                 attached_to_id = source_node[1][consts.Consts.attached_to_ref]
-                attached_to = next(tmp_node for tmp_node in reversed_nodes if tmp_node[node_param_name][0] == attached_to_id)[node_param_name]
-                source_outgoing = len(attached_to[1][consts.Consts.outgoing_flow])
-            target_node = bpmn_graph.get_node_by_id(flow[2][consts.Consts.target_ref])
+                attached_to = next(tmp_node for tmp_node in reversed_nodes if tmp_node[node_param_name][0] == attached_to_id)[
+                    node_param_name]
+                source_outgoing = len(
+                    attached_to[1][consts.Consts.outgoing_flow])
+            target_node = bpmn_graph.get_node_by_id(
+                flow[2][consts.Consts.target_ref])
         source_width = int(source_node[1][consts.Consts.width])
         source_height = int(source_node[1][consts.Consts.height])
         source_x = int(source_node[1][consts.Consts.x])
@@ -672,18 +734,18 @@ def set_flows_waypoints(bpmn_graph, back_edges_ids, reversed_nodes):
             else:
                 if reversed:
                     flow[2][consts.Consts.waypoints] = [(str(target_x + target_width//2),
-                                                     str(target_y)),
-                                                    (str(target_x + target_width//2),
-                                                     str(source_y + source_height//2)),
-                                                     (str(source_x + source_width),
-                                                     str(source_y + source_height//2))]
+                                                         str(target_y)),
+                                                        (str(target_x + target_width//2),
+                                                         str(source_y + source_height//2)),
+                                                        (str(source_x + source_width),
+                                                         str(source_y + source_height//2))]
                 else:
                     flow[2][consts.Consts.waypoints] = [(str(source_x + source_width),
-                                                     str(source_y + source_height//2)),
-                                                    (str(target_x + target_width//2),
-                                                     str(source_y + source_height//2)),
-                                                    (str(target_x + target_width//2),
-                                                     str(target_y))]
+                                                         str(source_y + source_height//2)),
+                                                        (str(target_x + target_width//2),
+                                                         str(source_y + source_height//2)),
+                                                        (str(target_x + target_width//2),
+                                                         str(target_y))]
         else:
             if source_outgoing > 1:  # split
                 if reversed:
