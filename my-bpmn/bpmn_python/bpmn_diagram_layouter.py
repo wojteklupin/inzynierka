@@ -338,6 +338,9 @@ def grid_layout(flows, sorted_nodes_with_classification, symmetric):
     """
     tmp_nodes_with_classification = list(sorted_nodes_with_classification)
 
+    for node in tmp_nodes_with_classification:
+        print(node["node"][1]["node_name"])
+
     last_row = consts.Consts.grid_column_width
     last_col = 1
     grid = []
@@ -392,12 +395,12 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
             insert_into_grid(grid, current_element_row,
                              current_element_col, predecessor_cell.branches, node_id)
         else:  # predecessor is split
-            if predecessor_cell.branches[-1] == 0:  # branches go 1 level up
+            if predecessor_cell.branches[-1] == 0 and len(predecessor_cell.branches) > 1:  # branches go 1 level up
                 if predecessor_outs == predecessor[consts.Consts.next_free_branch] or \
                         (predecessor_outs == 2 and predecessor[consts.Consts.next_free_branch] == 1):  # last element
                     if predecessor_outs % 2 == 0:  # non-symmetrical
                         branches = predecessor_cell.branches + \
-                            [predecessor_outs//2 - 1]
+                            [predecessor_outs//2]
                     else:
                         branches = predecessor_cell.branches + \
                             [predecessor_outs//2]
@@ -406,8 +409,7 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
                 else:
                     current_element_col = predecessor_cell.col + 1
                     if predecessor_outs % 2 == 0:  # non-symmetrical
-                        offset = predecessor[consts.Consts.next_free_branch] - \
-                            predecessor_outs//2
+                        offset = predecessor[consts.Consts.next_free_branch] - predecessor_outs//2
                         if offset != 0:
                             current_element_row = predecessor_cell.row + offset
                             branches = predecessor_cell.branches + \
@@ -415,8 +417,7 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
                             predecessor[consts.Consts.next_free_branch] += 1
                         else:
                             current_element_row = predecessor_cell.row + offset + 1
-                            branches = predecessor_cell.branches + \
-                                [predecessor[consts.Consts.next_free_branch] + 1]
+                            branches = predecessor_cell.branches + [predecessor[consts.Consts.next_free_branch] + 1]
                             predecessor[consts.Consts.next_free_branch] += 2
                         insert_into_grid(grid, current_element_row,
                                          current_element_col, branches, node_id)
@@ -557,6 +558,8 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
     # if split
     if len(outgoing_flows) > 1:
         node_with_classification[consts.Consts.next_free_branch] = 0
+        # sprawdzic czy ma swojego joina bezposrednio i czy krawedz prowadzaca do niego jest zgodna z przeplywem: node_with_classification[consts.Consts.corresponding_join] = id_tego_joina lub None
+        # 
 
     return grid, last_row, last_col
 
