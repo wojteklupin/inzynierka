@@ -49,7 +49,7 @@ def generate_layout(bpmn_graph, symmetric=False):
         flows_copy_reversed, nodes_copy_reversed)
 
     grid = grid_layout(flows_copy_reversed,
-                       sorted_nodes_with_classification, symmetric)
+                       sorted_nodes_with_classification, back_edges_ids, symmetric)
 
     set_coordinates_for_nodes(bpmn_graph, grid)
     set_flows_waypoints(bpmn_graph, back_edges_ids,
@@ -329,7 +329,7 @@ def reverse_flows(flows, tmp_nodes_with_classification, back_edges_ids):
                 break
 
 
-def grid_layout(flows, sorted_nodes_with_classification, symmetric):
+def grid_layout(flows, sorted_nodes_with_classification, back_edges_ids, symmetric):
     """
 
     :param sorted_nodes_with_classification:
@@ -347,11 +347,11 @@ def grid_layout(flows, sorted_nodes_with_classification, symmetric):
     while tmp_nodes_with_classification:
         node_with_classification = tmp_nodes_with_classification.pop(0)
         (grid, last_row, last_col) = place_element_in_grid(node_with_classification, grid, last_row, last_col,
-                                                           flows, tmp_nodes_with_classification, sorted_nodes_with_classification, symmetric)
+                                                           flows, tmp_nodes_with_classification, sorted_nodes_with_classification, back_edges_ids, symmetric)
     return grid
 
 
-def place_element_in_grid(node_with_classification, grid, last_row, last_col, flows, nodes_with_classification, all_nodes_with_classification, symmetric):
+def place_element_in_grid(node_with_classification, grid, last_row, last_col, flows, nodes_with_classification, all_nodes_with_classification, back_edges_ids, symmetric):
     """
 
     :param node_with_classification:
@@ -395,95 +395,25 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
             insert_into_grid(grid, current_element_row,
                              current_element_col, predecessor_cell.branches, node_id)
         else:  # predecessor is split
-            if predecessor_cell.branches[-1] == 0 and len(predecessor_cell.branches) > 1:  # branches go 1 level up
-                if predecessor_outs == predecessor[consts.Consts.next_free_branch] or \
-                        (predecessor_outs == 2 and predecessor[consts.Consts.next_free_branch] == 1):  # last element
-                    if predecessor_outs % 2 == 0:  # non-symmetrical
-                        branches = predecessor_cell.branches + \
-                            [predecessor_outs//2]
-                    else:
-                        branches = predecessor_cell.branches + \
-                            [predecessor_outs//2]
-                    insert_into_grid(grid, predecessor_cell.row,
-                                     predecessor_cell.col + 1, branches, node_id)
-                else:
-                    current_element_col = predecessor_cell.col + 1
-                    if predecessor_outs % 2 == 0:  # non-symmetrical
-                        offset = predecessor[consts.Consts.next_free_branch] - predecessor_outs//2
-                        if offset != 0:
-                            current_element_row = predecessor_cell.row + offset
-                            branches = predecessor_cell.branches + \
-                                [predecessor[consts.Consts.next_free_branch]]
-                            predecessor[consts.Consts.next_free_branch] += 1
-                        else:
-                            current_element_row = predecessor_cell.row + offset + 1
-                            branches = predecessor_cell.branches + [predecessor[consts.Consts.next_free_branch] + 1]
-                            predecessor[consts.Consts.next_free_branch] += 2
-                        insert_into_grid(grid, current_element_row,
-                                         current_element_col, branches, node_id)
-                        shift_nodes(branches, predecessor_outs//2, grid)
-                    else:
-                        offset = predecessor[consts.Consts.next_free_branch] - \
-                            predecessor_outs//2
-                        if offset != 0:
-                            current_element_row = predecessor_cell.row + offset
-                            branches = predecessor_cell.branches + \
-                                [predecessor[consts.Consts.next_free_branch]]
-                            predecessor[consts.Consts.next_free_branch] += 1
-                        else:
-                            current_element_row = predecessor_cell.row + offset + 1
-                            branches = predecessor_cell.branches + \
-                                [predecessor[consts.Consts.next_free_branch] + 1]
-                            predecessor[consts.Consts.next_free_branch] += 2
-                        insert_into_grid(grid, current_element_row,
-                                         current_element_col, branches, node_id)
-                        shift_nodes(branches, predecessor_outs//2, grid)
+            flow_before_split_id = predecessor[node_param_name][1][consts.Consts.incoming_flow][0]
+            current_element_col = predecessor_cell.col + 1
+
+            # non-symmetrical (doesn't matter if pair number of branches or not):
+            if predecessor[consts.Consts.center_branch_free] and predecessor[consts.Consts.corresponding_join] is None and \
+            ((flow_id in back_edges_ids and flow_before_split_id in back_edges_ids) or (flow_id not in back_edges_ids and flow_before_split_id not in back_edges_ids)):
+                branches = predecessor_cell.branches + [0]
+                insert_into_grid(grid, predecessor_cell.row,
+                                current_element_col, branches, node_id)
+                predecessor[consts.Consts.center_branch_free] = False
             else:
-                # last element
-                if predecessor_outs == predecessor[consts.Consts.next_free_branch]:
-                    if predecessor_outs % 2 == 0:  # non-symmetrical
-                        branches = predecessor_cell.branches + \
-                            [predecessor_outs//2 - 1]
-                    else:
-                        branches = predecessor_cell.branches + \
-                            [predecessor_outs//2]
-                    insert_into_grid(grid, predecessor_cell.row,
-                                     predecessor_cell.col + 1, branches, node_id)
-                else:
-                    current_element_col = predecessor_cell.col + 1
-                    if predecessor_outs % 2 == 0:  # non-symmetrical
-                        offset = 1 + \
-                            predecessor[consts.Consts.next_free_branch] - \
-                            predecessor_outs//2
-                        if offset != 0:
-                            current_element_row = predecessor_cell.row + offset
-                            branches = predecessor_cell.branches + \
-                                [predecessor[consts.Consts.next_free_branch]]
-                            predecessor[consts.Consts.next_free_branch] += 1
-                        else:
-                            current_element_row = predecessor_cell.row + offset + 1
-                            branches = predecessor_cell.branches + \
-                                [predecessor[consts.Consts.next_free_branch] + 1]
-                            predecessor[consts.Consts.next_free_branch] += 2
-                        insert_into_grid(grid, current_element_row,
-                                         current_element_col, branches, node_id)
-                        shift_nodes(branches, predecessor_outs//2 - 1, grid)
-                    else:
-                        offset = predecessor[consts.Consts.next_free_branch] - \
-                            predecessor_outs//2
-                        if offset != 0:
-                            current_element_row = predecessor_cell.row + offset
-                            branches = predecessor_cell.branches + \
-                                [predecessor[consts.Consts.next_free_branch]]
-                            predecessor[consts.Consts.next_free_branch] += 1
-                        else:
-                            current_element_row = predecessor_cell.row + offset + 1
-                            branches = predecessor_cell.branches + \
-                                [predecessor[consts.Consts.next_free_branch] + 1]
-                            predecessor[consts.Consts.next_free_branch] += 2
-                        insert_into_grid(grid, current_element_row,
-                                         current_element_col, branches, node_id)
-                        shift_nodes(branches, predecessor_outs//2, grid)
+                if predecessor[consts.Consts.next_free_branch] == 0:
+                    predecessor[consts.Consts.next_free_branch] += 1
+                branches = predecessor_cell.branches + \
+                    [predecessor[consts.Consts.next_free_branch]]
+                insert_into_grid(grid, predecessor_cell.row + predecessor[consts.Consts.next_free_branch],
+                                current_element_col, branches, node_id)
+                predecessor[consts.Consts.next_free_branch] += 1
+                shift_nodes(branches, grid)
     # TODO consider rule for split/join node
     else:  # join
         # find the rightmost predecessor - put into next column
@@ -557,26 +487,46 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
 
     # if split
     if len(outgoing_flows) > 1:
-        node_with_classification[consts.Consts.next_free_branch] = 0
-        # sprawdzic czy ma swojego joina bezposrednio i czy krawedz prowadzaca do niego jest zgodna z przeplywem: node_with_classification[consts.Consts.corresponding_join] = id_tego_joina lub None
-        # 
+        # non-symmetrical:
+        branches = next(grid_cell for grid_cell in grid if grid_cell.node_id == node_id).branches
+        if len(outgoing_flows)%2 == 0 and not (branches[-1] == 0 and len(branches) > 1): # pair and branches go 1 level down
+            node_with_classification[consts.Consts.next_free_branch] = -len(outgoing_flows) // 2 + 1
+        else:
+            node_with_classification[consts.Consts.next_free_branch] = -len(outgoing_flows) // 2
+            
+        node_with_classification[consts.Consts.center_branch_free] = True
+        
+        node_with_classification[consts.Consts.corresponding_join] = None
+        for flow_id in node_with_classification[node_param_name][1][consts.Consts.outgoing_flow]:
+            flow = flows[flow_id]
+            potential_join_id = flow[consts.Consts.target_ref]
+            potential_join = next(node for node in all_nodes_with_classification if node[node_param_name][0] == potential_join_id)
+            if len(potential_join[node_param_name][1][consts.Consts.incoming_flow]) > 1: # is corresponding join
+                if (incoming_flows[0] in back_edges_ids) and (flow_id in back_edges_ids) or \
+                    (incoming_flows[0] not in back_edges_ids) and (flow_id not in back_edges_ids):
+                    node_with_classification[consts.Consts.corresponding_join] = potential_join_id
+                    break
+
 
     return grid, last_row, last_col
 
-def shift_nodes(branches, center, grid):
-    if branches[-1] < center:  # shift appropriate nodes up
+def shift_nodes(branches, grid):
+    if branches[-1] < 0:  # shift appropriate nodes up
         for level in range(1, len(branches)):
             slice = branches[:level]
             slice[-1] -= 1
-            while slice[-1] >= 0:
+            found = True
+            while found:
+                found = False
                 for cell in grid:
                     try:
                         if cell.branches[:len(slice)] == slice:
+                            found = True
                             cell.row -= 1
                     except AttributeError:
                         pass
                 slice[-1] -= 1
-    elif branches[-1] > center: # shift appropriate nodes down
+    else: # shift appropriate nodes down
         for level in range(1, len(branches)):
             slice = branches[:level]
             slice[-1] += 1

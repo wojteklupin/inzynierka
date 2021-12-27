@@ -4,7 +4,6 @@ ważne:
     optimize searching corresponding split
     finding corresponding split as an option
     centering node even when not in one cell of grid
-    better handling of cycles - reverse not too many
 mało ważne:
     sortowanie topologiczne ma niepotrzebny foreach w 11. linijce pseudokodu na overleaf
 

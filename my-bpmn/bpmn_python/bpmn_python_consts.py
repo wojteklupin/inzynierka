@@ -102,3 +102,5 @@ class Consts(object):
 
     grid_column_width = 1
     next_free_branch = "next_free_branch"
+    center_branch_free = "center_branch_free"
+    corresponding_join = "corresponding_join"
