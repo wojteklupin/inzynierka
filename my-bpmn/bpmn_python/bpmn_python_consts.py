@@ -104,3 +104,5 @@ class Consts(object):
     next_free_branch = "next_free_branch"
     center_branch_free = "center_branch_free"
     corresponding_join = "corresponding_join"
+    branch_offset = "branch_offset"
+    center_branch_number = "center_branch_number"

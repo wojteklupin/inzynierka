@@ -49,7 +49,7 @@ def generate_layout(bpmn_graph, symmetric=False):
         flows_copy_reversed, nodes_copy_reversed)
 
     grid = grid_layout(flows_copy_reversed,
-                       sorted_nodes_with_classification, back_edges_ids, symmetric)
+                       sorted_nodes_with_classification, bpmn_graph, back_edges_ids, symmetric)
 
     set_coordinates_for_nodes(bpmn_graph, grid)
     set_flows_waypoints(bpmn_graph, back_edges_ids,
@@ -329,7 +329,7 @@ def reverse_flows(flows, tmp_nodes_with_classification, back_edges_ids):
                 break
 
 
-def grid_layout(flows, sorted_nodes_with_classification, back_edges_ids, symmetric):
+def grid_layout(flows, sorted_nodes_with_classification, bpmn_graph, back_edges_ids, symmetric):
     """
 
     :param sorted_nodes_with_classification:
@@ -347,11 +347,11 @@ def grid_layout(flows, sorted_nodes_with_classification, back_edges_ids, symmetr
     while tmp_nodes_with_classification:
         node_with_classification = tmp_nodes_with_classification.pop(0)
         (grid, last_row, last_col) = place_element_in_grid(node_with_classification, grid, last_row, last_col,
-                                                           flows, tmp_nodes_with_classification, sorted_nodes_with_classification, back_edges_ids, symmetric)
+                                                           flows, tmp_nodes_with_classification, sorted_nodes_with_classification, bpmn_graph, back_edges_ids, symmetric)
     return grid
 
 
-def place_element_in_grid(node_with_classification, grid, last_row, last_col, flows, nodes_with_classification, all_nodes_with_classification, back_edges_ids, symmetric):
+def place_element_in_grid(node_with_classification, grid, last_row, last_col, flows, nodes_with_classification, all_nodes_with_classification, bpmn_graph, back_edges_ids, symmetric):
     """
 
     :param node_with_classification:
@@ -368,6 +368,9 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
     node_id = node_with_classification[node_param_name][0]
     incoming_flows = node_with_classification[node_param_name][1][consts.Consts.incoming_flow]
     outgoing_flows = node_with_classification[node_param_name][1][consts.Consts.outgoing_flow]
+
+    if node_with_classification[node_param_name][1]["node_name"] == "Task3":
+        print("dfgrg")
 
     if len(incoming_flows) == 0:
         # if node has no incoming flow, put it in new row
@@ -398,22 +401,24 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
             flow_before_split_id = predecessor[node_param_name][1][consts.Consts.incoming_flow][0]
             current_element_col = predecessor_cell.col + 1
 
-            # non-symmetrical (doesn't matter if pair number of branches or not):
+            # non-symmetrical:
             if predecessor[consts.Consts.center_branch_free] and predecessor[consts.Consts.corresponding_join] is None and \
             ((flow_id in back_edges_ids and flow_before_split_id in back_edges_ids) or (flow_id not in back_edges_ids and flow_before_split_id not in back_edges_ids)):
-                branches = predecessor_cell.branches + [0]
+                branches = predecessor_cell.branches + [predecessor[consts.Consts.center_branch_number]]
                 insert_into_grid(grid, predecessor_cell.row,
                                 current_element_col, branches, node_id)
                 predecessor[consts.Consts.center_branch_free] = False
+                if predecessor[consts.Consts.next_free_branch] == predecessor[consts.Consts.center_branch_number]:
+                    predecessor[consts.Consts.next_free_branch] += 1
             else:
-                if predecessor[consts.Consts.next_free_branch] == 0:
+                if predecessor[consts.Consts.next_free_branch] == predecessor[consts.Consts.center_branch_number]:
                     predecessor[consts.Consts.next_free_branch] += 1
                 branches = predecessor_cell.branches + \
                     [predecessor[consts.Consts.next_free_branch]]
-                insert_into_grid(grid, predecessor_cell.row + predecessor[consts.Consts.next_free_branch],
+                insert_into_grid(grid, predecessor_cell.row + predecessor[consts.Consts.next_free_branch] - predecessor[consts.Consts.center_branch_number],
                                 current_element_col, branches, node_id)
                 predecessor[consts.Consts.next_free_branch] += 1
-                shift_nodes(branches, grid)
+                shift_nodes(branches, predecessor[consts.Consts.center_branch_number], grid)
     # TODO consider rule for split/join node
     else:  # join
         # find the rightmost predecessor - put into next column
@@ -477,6 +482,16 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
                         previous_cell[node_param_name][0]).branches
         insert_into_grid(grid, current_element_row,
                          current_element_col, branches, node_id)
+
+        corresponding_split = next(node for node in all_nodes_with_classification if node[node_param_name][0] == previous_cell[node_param_name][0])
+        corresponding_split_id = corresponding_split[node_param_name][0]
+        for flow_id in incoming_flows:
+            flow = flows[flow_id]
+            if flow[consts.Consts.source_ref] == corresponding_split_id:
+                if corresponding_split[consts.Consts.corresponding_join] is None:
+                    bpmn_graph.get_flow_by_id(flow_id)[2][consts.Consts.branch_offset] = corresponding_split[consts.Consts.next_free_branch] - corresponding_split[consts.Consts.center_branch_number]
+                break
+            
         # remove unneccesary finished branches
         for cell in grid:
             try:
@@ -489,10 +504,11 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
     if len(outgoing_flows) > 1:
         # non-symmetrical:
         branches = next(grid_cell for grid_cell in grid if grid_cell.node_id == node_id).branches
+        node_with_classification[consts.Consts.next_free_branch] = 0
         if len(outgoing_flows)%2 == 0 and not (branches[-1] == 0 and len(branches) > 1): # pair and branches go 1 level down
-            node_with_classification[consts.Consts.next_free_branch] = -len(outgoing_flows) // 2 + 1
+            node_with_classification[consts.Consts.center_branch_number] = len(outgoing_flows) // 2 - 1
         else:
-            node_with_classification[consts.Consts.next_free_branch] = -len(outgoing_flows) // 2
+            node_with_classification[consts.Consts.center_branch_number] = len(outgoing_flows) // 2
             
         node_with_classification[consts.Consts.center_branch_free] = True
         
@@ -505,13 +521,13 @@ def place_element_in_grid(node_with_classification, grid, last_row, last_col, fl
                 if (incoming_flows[0] in back_edges_ids) and (flow_id in back_edges_ids) or \
                     (incoming_flows[0] not in back_edges_ids) and (flow_id not in back_edges_ids):
                     node_with_classification[consts.Consts.corresponding_join] = potential_join_id
-                    break
+                break
 
 
     return grid, last_row, last_col
 
-def shift_nodes(branches, grid):
-    if branches[-1] < 0:  # shift appropriate nodes up
+def shift_nodes(branches, center, grid):
+    if branches[-1] < center:  # shift appropriate nodes up
         for level in range(1, len(branches)):
             slice = branches[:level]
             slice[-1] -= 1
@@ -657,8 +673,56 @@ def set_flows_waypoints(bpmn_graph, back_edges_ids, reversed_nodes):
         target_x = int(target_node[1][consts.Consts.x])
         target_y = int(target_node[1][consts.Consts.y])
 
-        if source_y + source_height//2 == target_y + target_height//2:
-            # TODO what if an element is between source and target?
+        if consts.Consts.branch_offset in flow[2]:
+            if reversed:
+                if flow[2][consts.Consts.branch_offset] == 0:
+                    flow[2][consts.Consts.waypoints] = [(str(target_x),
+                                                     str(target_y + target_height // 2)),
+                                                    (str(source_x + source_width),
+                                                     str(source_y + source_height // 2))]
+                elif flow[2][consts.Consts.branch_offset] > 0:
+                    flow[2][consts.Consts.waypoints] = [(str(target_x + target_width // 2),
+                                                     str(target_y + target_height)),
+                                                    (str(target_x + target_width // 2),
+                                                     str(target_y + target_height // 2 + 150 * flow[2][consts.Consts.branch_offset])),
+                                                    (str(source_x + source_width // 2),
+                                                     str(target_y + target_height // 2 + 150 * flow[2][consts.Consts.branch_offset])),
+                                                    (str(source_x + source_width // 2),
+                                                     str(source_y + source_height))]
+                else:
+                    flow[2][consts.Consts.waypoints] = [(str(target_x + target_width // 2),
+                                                     str(target_y)),
+                                                    (str(target_x + target_width // 2),
+                                                     str(target_y + target_height // 2 + 150 * flow[2][consts.Consts.branch_offset])),
+                                                    (str(source_x + source_width // 2),
+                                                     str(target_y + target_height // 2 + 150 * flow[2][consts.Consts.branch_offset])),
+                                                    (str(source_x + source_width // 2),
+                                                     str(source_y))]
+            else:
+                if flow[2][consts.Consts.branch_offset] == 0:
+                    flow[2][consts.Consts.waypoints] = [(str(source_x + source_width),
+                                                     str(source_y + source_height // 2)),
+                                                    (str(target_x),
+                                                     str(target_y + target_height // 2))]
+                elif flow[2][consts.Consts.branch_offset] > 0:
+                    flow[2][consts.Consts.waypoints] = [(str(source_x + source_width // 2),
+                                                     str(source_y + source_height)),
+                                                     (str(source_x + source_width // 2),
+                                                     str(source_y + source_height // 2 + 150 * flow[2][consts.Consts.branch_offset])),
+                                                    (str(target_x + target_width // 2),
+                                                     str(source_y + source_height // 2 + 150 * flow[2][consts.Consts.branch_offset])),
+                                                     (str(target_x + target_width // 2),
+                                                     str(source_y + source_height))]
+                else:
+                    flow[2][consts.Consts.waypoints] = [(str(source_x + source_width // 2),
+                                                     str(source_y)),
+                                                     (str(source_x + source_width // 2),
+                                                     str(source_y + source_height // 2 + 150 * flow[2][consts.Consts.branch_offset])),
+                                                    (str(target_x + target_width // 2),
+                                                     str(source_y + source_height // 2 + 150 * flow[2][consts.Consts.branch_offset])),
+                                                     (str(target_x + target_width // 2),
+                                                     str(target_y))]
+        elif source_y + source_height//2 == target_y + target_height//2:
             if reversed:
                 flow[2][consts.Consts.waypoints] = [(str(target_x),
                                                      str(target_y + target_height // 2)),
